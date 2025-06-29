@@ -1,6 +1,6 @@
 
-import React, { useState, useCallback } from 'react';
-import { Upload, Leaf, Image as ImageIcon, Loader2, AlertTriangle, Shield, Pill } from 'lucide-react';
+import React, { useState, useCallback, useRef } from 'react';
+import { Upload, Leaf, Camera, Loader2, AlertTriangle, Shield, Pill, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
@@ -10,7 +10,10 @@ const Index = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isDragOver, setIsDragOver] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   const handleImageUpload = useCallback((file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -27,29 +30,61 @@ const Index = () => {
     setAnalysis(null);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
-      handleImageUpload(files[0]);
-    }
-  }, [handleImageUpload]);
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  }, []);
-
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       handleImageUpload(file);
+    }
+  };
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+      setShowCamera(true);
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      toast.error('Could not access camera. Please check permissions.');
+    }
+  };
+
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    setShowCamera(false);
+  };
+
+  const captureImage = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      if (ctx) {
+        ctx.drawImage(video, 0, 0);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
+            handleImageUpload(file);
+            stopCamera();
+          }
+        }, 'image/jpeg', 0.8);
+      }
     }
   };
 
@@ -61,7 +96,6 @@ const Index = () => {
 
     setIsAnalyzing(true);
     try {
-      // Convert image to base64
       const base64 = await new Promise<string>((resolve) => {
         const reader = new FileReader();
         reader.onload = () => {
@@ -114,191 +148,263 @@ const Index = () => {
     }
   };
 
+  const parseAnalysis = (text: string) => {
+    const sections = text.split('**').filter(section => section.trim());
+    const parsedSections: { title: string; content: string }[] = [];
+    
+    for (let i = 0; i < sections.length; i += 2) {
+      if (sections[i] && sections[i + 1]) {
+        parsedSections.push({
+          title: sections[i].replace(':', '').trim(),
+          content: sections[i + 1].trim()
+        });
+      }
+    }
+    
+    return parsedSections;
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-3 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl">
-              <Leaf className="w-8 h-8 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50">
+      {/* Header */}
+      <div className="bg-white/90 backdrop-blur-sm border-b border-green-100 sticky top-0 z-40">
+        <div className="px-4 py-4">
+          <div className="flex items-center justify-center gap-2">
+            <div className="p-2 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl">
+              <Leaf className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
               Plant Disease Detector
             </h1>
           </div>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            AI-powered plant health analysis for farmers. Upload a photo of your crops to identify diseases, pests, and get treatment recommendations.
+          <p className="text-sm text-gray-600 text-center mt-2">
+            AI-powered plant health analysis for farmers
           </p>
         </div>
+      </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {/* Upload Section */}
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-            <CardContent className="p-8">
-              <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-                <Upload className="w-6 h-6 text-green-600" />
-                Upload Plant Image
-              </h2>
-              
-              <div
-                className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 ${
-                  isDragOver
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-gray-300 hover:border-green-400 hover:bg-green-50/50'
-                }`}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-              >
-                {imagePreview ? (
-                  <div className="space-y-4">
-                    <img
-                      src={imagePreview}
-                      alt="Plant preview"
-                      className="max-w-full max-h-64 mx-auto rounded-lg shadow-lg"
-                    />
-                    <div className="flex gap-3 justify-center">
-                      <Button
-                        onClick={() => document.getElementById('file-input')?.click()}
-                        variant="outline"
-                        className="border-green-200 hover:border-green-400"
-                      >
-                        <ImageIcon className="w-4 h-4 mr-2" />
-                        Change Image
-                      </Button>
-                      <Button
-                        onClick={analyzeImage}
-                        disabled={isAnalyzing}
-                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-                      >
-                        {isAnalyzing ? (
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        ) : (
-                          <Leaf className="w-4 h-4 mr-2" />
-                        )}
-                        {isAnalyzing ? 'Analyzing Plant...' : 'Diagnose Plant'}
-                      </Button>
-                    </div>
+      <div className="px-4 py-6 space-y-6">
+        {/* Upload Section */}
+        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+          <CardContent className="p-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Upload className="w-5 h-5 text-green-600" />
+              Upload or Capture Image
+            </h2>
+            
+            {imagePreview ? (
+              <div className="space-y-4">
+                <div className="relative">
+                  <img
+                    src={imagePreview}
+                    alt="Plant preview"
+                    className="w-full max-h-64 object-cover rounded-lg shadow-md"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    onClick={() => document.getElementById('file-input')?.click()}
+                    variant="outline"
+                    className="border-green-200 hover:border-green-400"
+                    size="sm"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    New Image
+                  </Button>
+                  <Button
+                    onClick={startCamera}
+                    variant="outline"
+                    className="border-green-200 hover:border-green-400"
+                    size="sm"
+                  >
+                    <Camera className="w-4 h-4 mr-2" />
+                    Camera
+                  </Button>
+                </div>
+                <Button
+                  onClick={analyzeImage}
+                  disabled={isAnalyzing}
+                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                >
+                  {isAnalyzing ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Leaf className="w-4 h-4 mr-2" />
+                  )}
+                  {isAnalyzing ? 'Analyzing...' : 'Diagnose Plant'}
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center">
+                  <div className="w-12 h-12 mx-auto bg-gradient-to-r from-green-100 to-emerald-100 rounded-full flex items-center justify-center mb-4">
+                    <Leaf className="w-6 h-6 text-green-600" />
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="w-16 h-16 mx-auto bg-gradient-to-r from-green-100 to-emerald-100 rounded-full flex items-center justify-center">
-                      <Leaf className="w-8 h-8 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-lg font-medium text-gray-700 mb-2">
-                        Drop your plant image here, or click to browse
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Take clear photos of affected leaves, stems, or fruits for best results
-                      </p>
-                    </div>
+                  <p className="text-gray-600 mb-4">
+                    Take a clear photo of affected leaves, stems, or fruits
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
                     <Button
                       onClick={() => document.getElementById('file-input')?.click()}
                       className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                      size="sm"
                     >
                       <Upload className="w-4 h-4 mr-2" />
-                      Choose File
+                      Upload
+                    </Button>
+                    <Button
+                      onClick={startCamera}
+                      variant="outline"
+                      className="border-green-200 hover:border-green-400"
+                      size="sm"
+                    >
+                      <Camera className="w-4 h-4 mr-2" />
+                      Camera
                     </Button>
                   </div>
-                )}
+                </div>
               </div>
+            )}
 
-              <input
-                id="file-input"
-                type="file"
-                accept="image/*"
-                onChange={handleFileInput}
-                className="hidden"
+            <input
+              id="file-input"
+              type="file"
+              accept="image/*"
+              onChange={handleFileInput}
+              className="hidden"
+            />
+          </CardContent>
+        </Card>
+
+        {/* Camera Modal */}
+        {showCamera && (
+          <div className="fixed inset-0 bg-black z-50 flex flex-col">
+            <div className="flex items-center justify-between p-4 bg-black/50">
+              <h3 className="text-white font-semibold">Capture Plant Image</h3>
+              <Button
+                onClick={stopCamera}
+                variant="outline"
+                size="sm"
+                className="text-white border-white"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="flex-1 relative">
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                playsInline
+                muted
               />
-            </CardContent>
-          </Card>
+              <canvas ref={canvasRef} className="hidden" />
+            </div>
+            <div className="p-4 bg-black/50">
+              <Button
+                onClick={captureImage}
+                className="w-full bg-white text-black hover:bg-gray-100"
+              >
+                <Camera className="w-4 h-4 mr-2" />
+                Capture Image
+              </Button>
+            </div>
+          </div>
+        )}
 
-          {/* Analysis Section */}
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-            <CardContent className="p-8">
-              <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-                <AlertTriangle className="w-6 h-6 text-emerald-600" />
-                Disease Analysis
-              </h2>
-              
-              {isAnalyzing ? (
-                <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                  <div className="relative">
-                    <div className="w-16 h-16 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full flex items-center justify-center">
-                      <Loader2 className="w-8 h-8 text-white animate-spin" />
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full animate-pulse opacity-20"></div>
+        {/* Analysis Section */}
+        {isAnalyzing && (
+          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                <div className="relative">
+                  <div className="w-12 h-12 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full flex items-center justify-center">
+                    <Loader2 className="w-6 h-6 text-white animate-spin" />
                   </div>
-                  <p className="text-lg font-medium text-gray-700">Analyzing your plant...</p>
-                  <p className="text-sm text-gray-500">AI is examining for diseases and health issues</p>
                 </div>
-              ) : analysis ? (
-                <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-6">
-                    <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                      <Leaf className="w-5 h-5 text-green-600" />
-                      Diagnosis Report
-                    </h3>
-                    <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
-                      {analysis.split('\n').map((paragraph, index) => (
-                        <p key={index} className="mb-3 last:mb-0">
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                  <Button
-                    onClick={analyzeImage}
-                    variant="outline"
-                    className="w-full border-green-200 hover:border-green-400"
-                    disabled={!selectedImage}
-                  >
-                    <Leaf className="w-4 h-4 mr-2" />
-                    Analyze Again
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 space-y-4 text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
-                    <AlertTriangle className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <p className="text-lg font-medium text-gray-500">Ready for diagnosis</p>
-                  <p className="text-sm text-gray-400 max-w-sm">
-                    Upload a plant image and click "Diagnose Plant" to get detailed health analysis and treatment recommendations
-                  </p>
-                </div>
-              )}
+                <p className="text-lg font-medium text-gray-700">Analyzing plant...</p>
+                <p className="text-sm text-gray-500 text-center">AI is examining for diseases and health issues</p>
+              </div>
             </CardContent>
           </Card>
-        </div>
+        )}
+
+        {/* Structured Analysis Results */}
+        {analysis && !isAnalyzing && (
+          <div className="space-y-4">
+            {parseAnalysis(analysis).map((section, index) => {
+              const getIcon = (title: string) => {
+                if (title.includes('IDENTIFICATION')) return <Leaf className="w-5 h-5 text-green-600" />;
+                if (title.includes('DISEASE') || title.includes('ISSUE')) return <AlertTriangle className="w-5 h-5 text-red-600" />;
+                if (title.includes('SYMPTOMS')) return <AlertTriangle className="w-5 h-5 text-orange-600" />;
+                if (title.includes('CAUSES')) return <AlertTriangle className="w-5 h-5 text-yellow-600" />;
+                if (title.includes('TREATMENT')) return <Pill className="w-5 h-5 text-blue-600" />;
+                if (title.includes('PREVENTION')) return <Shield className="w-5 h-5 text-green-600" />;
+                if (title.includes('PROGNOSIS')) return <Leaf className="w-5 h-5 text-purple-600" />;
+                return <Leaf className="w-5 h-5 text-gray-600" />;
+              };
+
+              const getBgColor = (title: string) => {
+                if (title.includes('IDENTIFICATION')) return 'from-green-50 to-emerald-50';
+                if (title.includes('DISEASE') || title.includes('ISSUE')) return 'from-red-50 to-pink-50';
+                if (title.includes('SYMPTOMS')) return 'from-orange-50 to-amber-50';
+                if (title.includes('CAUSES')) return 'from-yellow-50 to-orange-50';
+                if (title.includes('TREATMENT')) return 'from-blue-50 to-indigo-50';
+                if (title.includes('PREVENTION')) return 'from-green-50 to-teal-50';
+                if (title.includes('PROGNOSIS')) return 'from-purple-50 to-pink-50';
+                return 'from-gray-50 to-slate-50';
+              };
+
+              return (
+                <Card key={index} className="border-0 shadow-md bg-white/80 backdrop-blur-sm">
+                  <CardContent className="p-4">
+                    <div className={`bg-gradient-to-r ${getBgColor(section.title)} rounded-lg p-4`}>
+                      <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                        {getIcon(section.title)}
+                        {section.title}
+                      </h3>
+                      <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                        {section.content}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+            
+            <Button
+              onClick={analyzeImage}
+              variant="outline"
+              className="w-full border-green-200 hover:border-green-400 mt-4"
+              disabled={!selectedImage}
+            >
+              <Leaf className="w-4 h-4 mr-2" />
+              Analyze Again
+            </Button>
+          </div>
+        )}
 
         {/* Features Section */}
-        <div className="mt-16 text-center">
-          <h3 className="text-2xl font-bold text-gray-800 mb-8">AI-Powered Plant Health Analysis</h3>
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
-              </div>
-              <h4 className="font-semibold text-gray-800 mb-2">Disease Detection</h4>
-              <p className="text-sm text-gray-600">Identify fungal, bacterial, and viral diseases with detailed symptom analysis</p>
+        <div className="grid grid-cols-1 gap-4 mt-8">
+          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 shadow-md text-center">
+            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
             </div>
-            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Pill className="w-6 h-6 text-blue-600" />
-              </div>
-              <h4 className="font-semibold text-gray-800 mb-2">Treatment Recommendations</h4>
-              <p className="text-sm text-gray-600">Get specific treatment options including organic and chemical solutions</p>
+            <h4 className="font-semibold text-gray-800 mb-2">Disease Detection</h4>
+            <p className="text-xs text-gray-600">Identify fungal, bacterial, and viral diseases</p>
+          </div>
+          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 shadow-md text-center">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <Pill className="w-5 h-5 text-blue-600" />
             </div>
-            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-6 h-6 text-green-600" />
-              </div>
-              <h4 className="font-semibold text-gray-800 mb-2">Prevention Tips</h4>
-              <p className="text-sm text-gray-600">Learn how to prevent diseases and maintain healthy crops</p>
+            <h4 className="font-semibold text-gray-800 mb-2">Treatment Plans</h4>
+            <p className="text-xs text-gray-600">Get organic and chemical treatment options</p>
+          </div>
+          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 shadow-md text-center">
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <Shield className="w-5 h-5 text-green-600" />
             </div>
+            <h4 className="font-semibold text-gray-800 mb-2">Prevention Tips</h4>
+            <p className="text-xs text-gray-600">Learn to prevent diseases and maintain healthy crops</p>
           </div>
         </div>
       </div>
