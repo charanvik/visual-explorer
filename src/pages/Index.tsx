@@ -1,6 +1,6 @@
 
 import React, { useState, useCallback } from 'react';
-import { Upload, Sparkles, Image as ImageIcon, Loader2, Eye } from 'lucide-react';
+import { Upload, Leaf, Image as ImageIcon, Loader2, AlertTriangle, Shield, Pill } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
@@ -55,7 +55,7 @@ const Index = () => {
 
   const analyzeImage = async () => {
     if (!selectedImage) {
-      toast.error('Please select an image first');
+      toast.error('Please select a plant image first');
       return;
     }
 
@@ -80,7 +80,7 @@ const Index = () => {
           contents: [{
             parts: [
               {
-                text: "Analyze this image in detail. Describe what you see, identify objects, people, activities, colors, mood, and any interesting details. Provide a comprehensive and engaging description."
+                text: "You are an expert plant pathologist and agricultural specialist. Analyze this plant image for diseases, pests, or health issues. Please provide a detailed analysis in the following format:\n\n**PLANT IDENTIFICATION:**\n- Plant type/species\n- Growth stage\n\n**DISEASE/ISSUE DETECTED:**\n- Disease name (if any)\n- Severity level (Mild/Moderate/Severe)\n- Confidence level in diagnosis\n\n**SYMPTOMS OBSERVED:**\n- Visible symptoms on leaves, stems, fruits\n- Color changes, spots, wilting, etc.\n\n**POSSIBLE CAUSES:**\n- Pathogen type (fungal, bacterial, viral, pest)\n- Environmental factors\n\n**TREATMENT RECOMMENDATIONS:**\n- Immediate actions needed\n- Organic treatment options\n- Chemical treatment options (if necessary)\n- Application methods and timing\n\n**PREVENTION TIPS:**\n- Cultural practices\n- Crop rotation suggestions\n- Monitoring recommendations\n\n**PROGNOSIS:**\n- Expected recovery time\n- Potential yield impact\n- Spread risk to other plants\n\nIf the image doesn't show a plant or shows a healthy plant, please indicate that clearly."
               },
               {
                 inline_data: {
@@ -102,33 +102,33 @@ const Index = () => {
       
       if (analysisText) {
         setAnalysis(analysisText);
-        toast.success('Image analyzed successfully!');
+        toast.success('Plant analysis completed!');
       } else {
         throw new Error('No analysis received');
       }
     } catch (error) {
-      console.error('Error analyzing image:', error);
-      toast.error('Failed to analyze image. Please try again.');
+      console.error('Error analyzing plant:', error);
+      toast.error('Failed to analyze plant. Please try again.');
     } finally {
       setIsAnalyzing(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl">
-              <Eye className="w-8 h-8 text-white" />
+            <div className="p-3 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl">
+              <Leaf className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Visual Gemini Explorer
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+              Plant Disease Detector
             </h1>
           </div>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Unlock the power of AI vision with Google's Gemini. Upload any image and discover intelligent insights.
+            AI-powered plant health analysis for farmers. Upload a photo of your crops to identify diseases, pests, and get treatment recommendations.
           </p>
         </div>
 
@@ -137,15 +137,15 @@ const Index = () => {
           <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
             <CardContent className="p-8">
               <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-                <Upload className="w-6 h-6 text-blue-600" />
-                Upload Image
+                <Upload className="w-6 h-6 text-green-600" />
+                Upload Plant Image
               </h2>
               
               <div
                 className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 ${
                   isDragOver
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50/50'
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-gray-300 hover:border-green-400 hover:bg-green-50/50'
                 }`}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
@@ -155,14 +155,14 @@ const Index = () => {
                   <div className="space-y-4">
                     <img
                       src={imagePreview}
-                      alt="Preview"
+                      alt="Plant preview"
                       className="max-w-full max-h-64 mx-auto rounded-lg shadow-lg"
                     />
                     <div className="flex gap-3 justify-center">
                       <Button
                         onClick={() => document.getElementById('file-input')?.click()}
                         variant="outline"
-                        className="border-blue-200 hover:border-blue-400"
+                        className="border-green-200 hover:border-green-400"
                       >
                         <ImageIcon className="w-4 h-4 mr-2" />
                         Change Image
@@ -170,33 +170,33 @@ const Index = () => {
                       <Button
                         onClick={analyzeImage}
                         disabled={isAnalyzing}
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
                       >
                         {isAnalyzing ? (
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         ) : (
-                          <Sparkles className="w-4 h-4 mr-2" />
+                          <Leaf className="w-4 h-4 mr-2" />
                         )}
-                        {isAnalyzing ? 'Analyzing...' : 'Analyze with AI'}
+                        {isAnalyzing ? 'Analyzing Plant...' : 'Diagnose Plant'}
                       </Button>
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="w-16 h-16 mx-auto bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
-                      <ImageIcon className="w-8 h-8 text-blue-600" />
+                    <div className="w-16 h-16 mx-auto bg-gradient-to-r from-green-100 to-emerald-100 rounded-full flex items-center justify-center">
+                      <Leaf className="w-8 h-8 text-green-600" />
                     </div>
                     <div>
                       <p className="text-lg font-medium text-gray-700 mb-2">
-                        Drop your image here, or click to browse
+                        Drop your plant image here, or click to browse
                       </p>
                       <p className="text-sm text-gray-500">
-                        Supports JPG, PNG, GIF, and other image formats
+                        Take clear photos of affected leaves, stems, or fruits for best results
                       </p>
                     </div>
                     <Button
                       onClick={() => document.getElementById('file-input')?.click()}
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                      className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
                     >
                       <Upload className="w-4 h-4 mr-2" />
                       Choose File
@@ -219,27 +219,27 @@ const Index = () => {
           <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
             <CardContent className="p-8">
               <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-                <Sparkles className="w-6 h-6 text-purple-600" />
-                AI Analysis
+                <AlertTriangle className="w-6 h-6 text-emerald-600" />
+                Disease Analysis
               </h2>
               
               {isAnalyzing ? (
                 <div className="flex flex-col items-center justify-center py-12 space-y-4">
                   <div className="relative">
-                    <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                    <div className="w-16 h-16 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full flex items-center justify-center">
                       <Loader2 className="w-8 h-8 text-white animate-spin" />
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full animate-pulse opacity-20"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full animate-pulse opacity-20"></div>
                   </div>
-                  <p className="text-lg font-medium text-gray-700">Analyzing your image...</p>
-                  <p className="text-sm text-gray-500">Gemini AI is examining every detail</p>
+                  <p className="text-lg font-medium text-gray-700">Analyzing your plant...</p>
+                  <p className="text-sm text-gray-500">AI is examining for diseases and health issues</p>
                 </div>
               ) : analysis ? (
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-6">
                     <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                      <Eye className="w-5 h-5 text-blue-600" />
-                      Gemini's Vision
+                      <Leaf className="w-5 h-5 text-green-600" />
+                      Diagnosis Report
                     </h3>
                     <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
                       {analysis.split('\n').map((paragraph, index) => (
@@ -252,21 +252,21 @@ const Index = () => {
                   <Button
                     onClick={analyzeImage}
                     variant="outline"
-                    className="w-full border-blue-200 hover:border-blue-400"
+                    className="w-full border-green-200 hover:border-green-400"
                     disabled={!selectedImage}
                   >
-                    <Sparkles className="w-4 h-4 mr-2" />
+                    <Leaf className="w-4 h-4 mr-2" />
                     Analyze Again
                   </Button>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 space-y-4 text-center">
                   <div className="w-16 h-16 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
-                    <Sparkles className="w-8 h-8 text-gray-400" />
+                    <AlertTriangle className="w-8 h-8 text-gray-400" />
                   </div>
-                  <p className="text-lg font-medium text-gray-500">Ready to analyze</p>
+                  <p className="text-lg font-medium text-gray-500">Ready for diagnosis</p>
                   <p className="text-sm text-gray-400 max-w-sm">
-                    Upload an image and click "Analyze with AI" to see what Gemini discovers
+                    Upload a plant image and click "Diagnose Plant" to get detailed health analysis and treatment recommendations
                   </p>
                 </div>
               )}
@@ -276,28 +276,28 @@ const Index = () => {
 
         {/* Features Section */}
         <div className="mt-16 text-center">
-          <h3 className="text-2xl font-bold text-gray-800 mb-8">Powered by Google Gemini AI</h3>
+          <h3 className="text-2xl font-bold text-gray-800 mb-8">AI-Powered Plant Health Analysis</h3>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg">
+              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+              <h4 className="font-semibold text-gray-800 mb-2">Disease Detection</h4>
+              <p className="text-sm text-gray-600">Identify fungal, bacterial, and viral diseases with detailed symptom analysis</p>
+            </div>
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Eye className="w-6 h-6 text-blue-600" />
+                <Pill className="w-6 h-6 text-blue-600" />
               </div>
-              <h4 className="font-semibold text-gray-800 mb-2">Object Detection</h4>
-              <p className="text-sm text-gray-600">Identify and describe objects, people, and scenes with remarkable accuracy</p>
+              <h4 className="font-semibold text-gray-800 mb-2">Treatment Recommendations</h4>
+              <p className="text-sm text-gray-600">Get specific treatment options including organic and chemical solutions</p>
             </div>
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-6 h-6 text-green-600" />
               </div>
-              <h4 className="font-semibold text-gray-800 mb-2">Context Understanding</h4>
-              <p className="text-sm text-gray-600">Understand activities, emotions, and relationships within images</p>
-            </div>
-            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <ImageIcon className="w-6 h-6 text-indigo-600" />
-              </div>
-              <h4 className="font-semibold text-gray-800 mb-2">Detailed Analysis</h4>
-              <p className="text-sm text-gray-600">Get comprehensive insights about colors, composition, and visual elements</p>
+              <h4 className="font-semibold text-gray-800 mb-2">Prevention Tips</h4>
+              <p className="text-sm text-gray-600">Learn how to prevent diseases and maintain healthy crops</p>
             </div>
           </div>
         </div>
