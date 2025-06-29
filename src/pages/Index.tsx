@@ -158,7 +158,7 @@ const Index = () => {
             <div className="p-2 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl">
               <Leaf className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Plant  doctor .ai</h1>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Plant doctor </h1>
           </div>
           <p className="text-sm text-gray-600 text-center mt-2">
             AI-powered plant health analysis for farmers
