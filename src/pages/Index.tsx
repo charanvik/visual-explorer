@@ -107,7 +107,7 @@ const Index = () => {
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: "You are an expert plant pathologist and agricultural specialist. Analyze this plant image for diseases, pests, or health issues. Please provide a detailed analysis in the following format:\n\nPLANT IDENTIFICATION:\n- Plant type/species\n- Growth stage\n\nDISEASE/ISSUE DETECTED:\n- Disease name (if any)\n- Severity level (Mild/Moderate/Severe)\n- Confidence level in diagnosis\n\nSYMPTOMS OBSERVED:\n- Visible symptoms on leaves, stems, fruits\n- Color changes, spots, wilting, etc.\n\nPOSSIBLE CAUSES:\n- Pathogen type (fungal, bacterial, viral, pest)\n- Environmental factors\n\nTREATMENT RECOMMENDATIONS:\n- Immediate actions needed\n- Organic treatment options\n- Chemical treatment options (if necessary)\n- Application methods and timing\n\nPREVENTION TIPS:\n- Cultural practices\n- Crop rotation suggestions\n- Monitoring recommendations\n\nPROGNOSIS:\n- Expected recovery time\n- Potential yield impact\n- Spread risk to other plants\n\nIf the image doesn't show a plant or shows a healthy plant, please indicate that clearly."
+              text: "You are an expert plant pathologist and agricultural specialist. Analyze this plant image for diseases, pests, or health issues. Please provide a detailed analysis in the following format:\n\n**PLANT IDENTIFICATION:**\n- Plant type/species\n- Growth stage\n\n**DISEASE/ISSUE DETECTED:**\n- Disease name (if any)\n- Severity level (Mild/Moderate/Severe)\n- Confidence level in diagnosis\n\n**SYMPTOMS OBSERVED:**\n- Visible symptoms on leaves, stems, fruits\n- Color changes, spots, wilting, etc.\n\n**POSSIBLE CAUSES:**\n- Pathogen type (fungal, bacterial, viral, pest)\n- Environmental factors\n\n**TREATMENT RECOMMENDATIONS:**\n- Immediate actions needed\n- Organic treatment options\n- Chemical treatment options (if necessary)\n- Application methods and timing\n\n**PREVENTION TIPS:**\n- Cultural practices\n- Crop rotation suggestions\n- Monitoring recommendations\n\n**PROGNOSIS:**\n- Expected recovery time\n- Potential yield impact\n- Spread risk to other plants\n\nIf the image doesn't show a plant or shows a healthy plant, please indicate that clearly."
             }, {
               inline_data: {
                 mime_type: selectedImage.type,
@@ -136,20 +136,19 @@ const Index = () => {
     }
   };
   const parseAnalysis = (text: string) => {
-    const cleanText = text.replace(/\*\*/g, '');
-    const sections = cleanText.split('\n\n').filter(section => section.trim());
-    const parsedSections: { title: string; content: string; }[] = [];
-    
-    sections.forEach(section => {
-      const lines = section.split('\n');
-      const title = lines[0]?.replace(':', '').trim();
-      const content = lines.slice(1).join('\n').trim();
-      
-      if (title && content) {
-        parsedSections.push({ title, content });
+    const sections = text.split('**').filter(section => section.trim());
+    const parsedSections: {
+      title: string;
+      content: string;
+    }[] = [];
+    for (let i = 0; i < sections.length; i += 2) {
+      if (sections[i] && sections[i + 1]) {
+        parsedSections.push({
+          title: sections[i].replace(':', '').trim(),
+          content: sections[i + 1].trim()
+        });
       }
-    });
-    
+    }
     return parsedSections;
   };
   const getSeverityBadge = (content: string) => {
@@ -243,21 +242,10 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        {/* Analyze Button - Improved FAB */}
+        {/* Analyze Button - Floating Action Button Style */}
         {selectedImage && !analysis && <div className="fixed bottom-6 right-4 z-40">
-            <Button 
-              onClick={analyzeImage} 
-              disabled={isAnalyzing} 
-              className="w-16 h-16 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl border-0 p-0 transition-all duration-200 transform hover:scale-105"
-            >
-              {isAnalyzing ? (
-                <Loader2 className="w-7 h-7 animate-spin" />
-              ) : (
-                <div className="flex flex-col items-center">
-                  <Bug className="w-6 h-6" />
-                  <span className="text-xs mt-0.5 font-medium">Scan</span>
-                </div>
-              )}
+            <Button onClick={analyzeImage} disabled={isAnalyzing} className="w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg border-0 p-0">
+              {isAnalyzing ? <Loader2 className="w-6 h-6 animate-spin" /> : <Bug className="w-6 h-6" />}
             </Button>
           </div>}
 
