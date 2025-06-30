@@ -1,6 +1,6 @@
 
 import React, { useState, useCallback, useRef } from 'react';
-import { Upload, Leaf, Camera, Loader2, AlertTriangle, Shield, Pill, X, CheckCircle, AlertCircle, Sparkles, Bug, Eye, ArrowRight, Zap } from 'lucide-react';
+import { Upload, Leaf, Camera, Loader2, AlertTriangle, Shield, Pill, X, CheckCircle, AlertCircle, Bug, Menu, Search, MoreVert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -128,7 +128,7 @@ const Index = () => {
       
       if (analysisText) {
         setAnalysis(analysisText);
-        toast.success('Plant analysis completed!');
+        toast.success('Analysis completed successfully!');
       } else {
         throw new Error('No analysis received');
       }
@@ -158,139 +158,128 @@ const Index = () => {
   const getSeverityBadge = (content: string) => {
     const lowerContent = content.toLowerCase();
     if (lowerContent.includes('severe')) {
-      return <Badge variant="destructive" className="ml-auto">Severe</Badge>;
+      return <Badge className="bg-red-500 text-white text-xs px-2 py-1">Severe</Badge>;
     }
     if (lowerContent.includes('moderate')) {
-      return <Badge className="ml-auto bg-orange-500 hover:bg-orange-600">Moderate</Badge>;
+      return <Badge className="bg-orange-500 text-white text-xs px-2 py-1">Moderate</Badge>;
     }
     if (lowerContent.includes('mild')) {
-      return <Badge className="ml-auto bg-yellow-500 hover:bg-yellow-600">Mild</Badge>;
+      return <Badge className="bg-yellow-600 text-white text-xs px-2 py-1">Mild</Badge>;
     }
     if (lowerContent.includes('healthy')) {
-      return <Badge className="ml-auto bg-green-500 hover:bg-green-600">Healthy</Badge>;
+      return <Badge className="bg-green-500 text-white text-xs px-2 py-1">Healthy</Badge>;
     }
     return null;
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Modern Header */}
-      <header className="bg-white border-b border-slate-200/60 sticky top-0 z-40 backdrop-blur-xl bg-white/95">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-center">
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                  <Leaf className="w-6 h-6 text-white" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
-                  <Sparkles className="w-2.5 h-2.5 text-white" />
-                </div>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900">PlantCare AI</h1>
-                <p className="text-sm text-slate-500">Smart Disease Detection</p>
-              </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Android-style Status Bar & App Bar */}
+      <div className="bg-green-600 text-white">
+        <div className="flex items-center justify-between px-4 py-3 pt-8">
+          <div className="flex items-center space-x-3">
+            <Menu className="w-6 h-6" />
+            <div>
+              <h1 className="text-lg font-medium">PlantCare</h1>
+              <p className="text-xs opacity-90">Disease Detection</p>
             </div>
           </div>
+          <div className="flex items-center space-x-2">
+            <Search className="w-6 h-6" />
+            <MoreVert className="w-6 h-6" />
+          </div>
         </div>
-      </header>
+      </div>
 
-      <main className="max-w-4xl mx-auto px-6 py-8 space-y-8">
-        {/* Hero Section */}
-        <div className="text-center space-y-4 py-8">
-          <h2 className="text-4xl font-bold text-slate-900 leading-tight">
-            Diagnose Plant Issues
-            <span className="block text-emerald-600">Instantly with AI</span>
-          </h2>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Upload or capture a photo of your plant to get professional-grade disease detection and treatment recommendations.
-          </p>
-        </div>
+      <div className="px-4 py-6 space-y-4">
+        {/* Hero Card */}
+        <Card className="bg-white rounded-lg shadow-sm border-0 overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <Leaf className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-medium text-gray-900">AI Plant Doctor</h2>
+                <p className="text-sm text-gray-600">Instant disease detection</p>
+              </div>
+            </div>
+            <p className="text-gray-700 leading-relaxed">
+              Upload a photo of your plant to get professional diagnosis and treatment recommendations powered by AI.
+            </p>
+          </CardContent>
+        </Card>
 
-        {/* Upload Section */}
-        <Card className="overflow-hidden border-0 shadow-xl shadow-slate-200/50">
+        {/* Image Upload Card */}
+        <Card className="bg-white rounded-lg shadow-sm border-0">
           <CardContent className="p-0">
             {imagePreview ? (
-              <div className="space-y-6 p-6">
-                <div className="relative">
+              <div className="space-y-4 p-4">
+                <div className="relative rounded-lg overflow-hidden">
                   <img 
                     src={imagePreview} 
                     alt="Plant preview" 
-                    className="w-full h-80 object-cover rounded-2xl" 
+                    className="w-full h-64 object-cover" 
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
+                  <div className="absolute top-2 right-2">
+                    <Button 
+                      onClick={() => {setImagePreview(null); setSelectedImage(null); setAnalysis(null);}}
+                      size="sm"
+                      variant="secondary"
+                      className="w-8 h-8 rounded-full p-0 bg-black/20 border-0 text-white hover:bg-black/40"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-3">
+                
+                <div className="grid grid-cols-2 gap-3">
                   <Button 
                     onClick={() => document.getElementById('file-input')?.click()} 
                     variant="outline" 
-                    className="flex-1 h-12 border-2"
+                    className="h-12 border border-gray-300 rounded-lg"
                   >
                     <Upload className="w-4 h-4 mr-2" />
-                    Upload New Photo
+                    Replace
                   </Button>
                   <Button 
                     onClick={startCamera} 
                     variant="outline" 
-                    className="flex-1 h-12 border-2"
+                    className="h-12 border border-gray-300 rounded-lg"
                   >
                     <Camera className="w-4 h-4 mr-2" />
-                    Take Photo
+                    Camera
                   </Button>
                 </div>
-                <Button 
-                  onClick={analyzeImage} 
-                  disabled={isAnalyzing} 
-                  className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-600/25"
-                >
-                  {isAnalyzing ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-5 h-5 mr-3" />
-                      Analyze Plant
-                      <ArrowRight className="w-5 h-5 ml-3" />
-                    </>
-                  )}
-                </Button>
               </div>
             ) : (
               <div className="p-8 text-center">
-                <div className="max-w-md mx-auto space-y-6">
-                  <div className="w-24 h-24 mx-auto bg-emerald-100 rounded-3xl flex items-center justify-center">
-                    <Leaf className="w-12 h-12 text-emerald-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-slate-900 mb-2">Upload Plant Image</h3>
-                    <p className="text-slate-600">
-                      Take a clear photo of affected leaves, stems, or fruits for accurate diagnosis
-                    </p>
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Button 
-                      onClick={() => document.getElementById('file-input')?.click()} 
-                      className="flex-1 h-12 bg-emerald-600 hover:bg-emerald-700"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Choose Photo
-                    </Button>
-                    <Button 
-                      onClick={startCamera} 
-                      variant="outline" 
-                      className="flex-1 h-12 border-2"
-                    >
-                      <Camera className="w-4 h-4 mr-2" />
-                      Take Photo
-                    </Button>
-                  </div>
+                <div className="w-20 h-20 mx-auto mb-6 bg-green-50 rounded-full flex items-center justify-center">
+                  <Leaf className="w-10 h-10 text-green-600" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Add Plant Photo</h3>
+                <p className="text-gray-600 mb-6 text-sm leading-relaxed">
+                  Take a clear photo of affected leaves or upload from gallery
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button 
+                    onClick={() => document.getElementById('file-input')?.click()} 
+                    className="h-12 bg-green-600 hover:bg-green-700 text-white rounded-lg"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Gallery
+                  </Button>
+                  <Button 
+                    onClick={startCamera} 
+                    variant="outline" 
+                    className="h-12 border border-gray-300 rounded-lg"
+                  >
+                    <Camera className="w-4 h-4 mr-2" />
+                    Camera
+                  </Button>
                 </div>
               </div>
             )}
-
             <input 
               id="file-input" 
               type="file" 
@@ -301,159 +290,122 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        {/* Camera Modal */}
-        {showCamera && (
-          <div className="fixed inset-0 bg-black z-50 flex flex-col">
-            <div className="flex items-center justify-between p-6">
-              <h3 className="text-white font-semibold text-lg">Capture Plant Image</h3>
-              <Button onClick={stopCamera} variant="ghost" size="sm" className="text-white hover:bg-white/20">
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-            <div className="flex-1 relative">
-              <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
-              <canvas ref={canvasRef} className="hidden" />
-              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                <div className="w-64 h-64 border-2 border-white/50 rounded-3xl"></div>
-              </div>
-            </div>
-            <div className="p-6">
-              <Button onClick={captureImage} className="w-full h-14 bg-white text-black hover:bg-gray-100 font-semibold rounded-2xl">
-                <Camera className="w-5 h-5 mr-3" />
-                Capture Image
-              </Button>
-            </div>
+        {/* Analyze Button - Floating Action Button Style */}
+        {selectedImage && !analysis && (
+          <div className="fixed bottom-6 right-4 z-40">
+            <Button 
+              onClick={analyzeImage} 
+              disabled={isAnalyzing} 
+              className="w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg border-0 p-0"
+            >
+              {isAnalyzing ? (
+                <Loader2 className="w-6 h-6 animate-spin" />
+              ) : (
+                <Bug className="w-6 h-6" />
+              )}
+            </Button>
           </div>
         )}
 
         {/* Loading State */}
         {isAnalyzing && (
-          <Card className="border-0 shadow-xl shadow-slate-200/50">
-            <CardContent className="p-12 text-center">
-              <div className="space-y-6">
-                <div className="w-16 h-16 mx-auto bg-emerald-100 rounded-full flex items-center justify-center">
-                  <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-2">Analyzing Your Plant</h3>
-                  <p className="text-slate-600">AI is examining the image for diseases and health issues...</p>
-                </div>
+          <Card className="bg-white rounded-lg shadow-sm border-0">
+            <CardContent className="p-6 text-center">
+              <div className="w-12 h-12 mx-auto mb-4 bg-green-50 rounded-full flex items-center justify-center">
+                <Loader2 className="w-6 h-6 text-green-600 animate-spin" />
               </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Analyzing...</h3>
+              <p className="text-gray-600 text-sm">AI is examining your plant for diseases</p>
             </CardContent>
           </Card>
         )}
 
         {/* Results */}
         {analysis && !isAnalyzing && (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h3 className="text-3xl font-bold text-slate-900 mb-2">Diagnosis Complete</h3>
-              <p className="text-slate-600">Here's what we found about your plant's health</p>
+          <div className="space-y-4">
+            <div className="text-center py-4">
+              <h3 className="text-xl font-medium text-gray-900 mb-1">Analysis Complete</h3>
+              <p className="text-gray-600 text-sm">Here's what we found</p>
             </div>
 
-            <div className="grid gap-6">
-              {parseAnalysis(analysis).map((section, index) => {
-                const getIcon = (title: string) => {
-                  if (title.includes('IDENTIFICATION')) return <Leaf className="w-5 h-5 text-emerald-600" />;
-                  if (title.includes('DISEASE') || title.includes('ISSUE')) return <Bug className="w-5 h-5 text-red-600" />;
-                  if (title.includes('SYMPTOMS')) return <AlertCircle className="w-5 h-5 text-orange-600" />;
-                  if (title.includes('CAUSES')) return <AlertTriangle className="w-5 h-5 text-amber-600" />;
-                  if (title.includes('TREATMENT')) return <Pill className="w-5 h-5 text-blue-600" />;
-                  if (title.includes('PREVENTION')) return <Shield className="w-5 h-5 text-green-600" />;
-                  if (title.includes('PROGNOSIS')) return <CheckCircle className="w-5 h-5 text-purple-600" />;
-                  return <Leaf className="w-5 h-5 text-slate-600" />;
-                };
+            {parseAnalysis(analysis).map((section, index) => {
+              const getIcon = (title: string) => {
+                if (title.includes('IDENTIFICATION')) return <Leaf className="w-5 h-5 text-green-600" />;
+                if (title.includes('DISEASE') || title.includes('ISSUE')) return <Bug className="w-5 h-5 text-red-600" />;
+                if (title.includes('SYMPTOMS')) return <AlertCircle className="w-5 h-5 text-orange-600" />;
+                if (title.includes('CAUSES')) return <AlertTriangle className="w-5 h-5 text-amber-600" />;
+                if (title.includes('TREATMENT')) return <Pill className="w-5 h-5 text-blue-600" />;
+                if (title.includes('PREVENTION')) return <Shield className="w-5 h-5 text-green-600" />;
+                if (title.includes('PROGNOSIS')) return <CheckCircle className="w-5 h-5 text-purple-600" />;
+                return <Leaf className="w-5 h-5 text-gray-600" />;
+              };
 
-                const isHighPriority = section.title.includes('DISEASE') || section.title.includes('TREATMENT');
+              const isHighPriority = section.title.includes('DISEASE') || section.title.includes('TREATMENT');
 
-                return (
-                  <Card key={index} className={`border-0 shadow-lg shadow-slate-200/50 ${isHighPriority ? 'ring-2 ring-red-100' : ''}`}>
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center">
-                            {getIcon(section.title)}
-                          </div>
-                          <h4 className="font-bold text-slate-900">{section.title}</h4>
+              return (
+                <Card key={index} className={`bg-white rounded-lg shadow-sm border-0 ${isHighPriority ? 'ring-1 ring-red-200' : ''}`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center">
+                          {getIcon(section.title)}
                         </div>
-                        {section.title.includes('DISEASE') && getSeverityBadge(section.content)}
+                        <h4 className="font-medium text-gray-900 text-sm">{section.title}</h4>
                       </div>
-                      <div className="prose prose-slate max-w-none">
-                        {section.content.split('\n').map((line, lineIndex) => {
-                          if (line.trim().startsWith('-')) {
-                            return (
-                              <div key={lineIndex} className="flex items-start space-x-3 py-2">
-                                <div className="w-2 h-2 bg-emerald-500 rounded-full mt-2 flex-shrink-0"></div>
-                                <span className="text-slate-700">{line.trim().substring(1).trim()}</span>
-                              </div>
-                            );
-                          }
-                          return line.trim() ? (
-                            <p key={lineIndex} className="font-medium text-slate-800 mb-2">
-                              {line.trim()}
-                            </p>
-                          ) : null;
-                        })}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+                      {section.title.includes('DISEASE') && getSeverityBadge(section.content)}
+                    </div>
+                    <div className="ml-13 space-y-2">
+                      {section.content.split('\n').map((line, lineIndex) => {
+                        if (line.trim().startsWith('-')) {
+                          return (
+                            <div key={lineIndex} className="flex items-start space-x-2 py-1">
+                              <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                              <span className="text-gray-700 text-sm leading-relaxed">{line.trim().substring(1).trim()}</span>
+                            </div>
+                          );
+                        }
+                        return line.trim() ? (
+                          <p key={lineIndex} className="font-medium text-gray-800 text-sm mb-1">
+                            {line.trim()}
+                          </p>
+                        ) : null;
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
 
-        {/* Features Section */}
-        <div className="py-16">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-slate-900 mb-4">Why Choose PlantCare AI?</h3>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Professional-grade plant disease detection powered by advanced AI technology
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-red-100 rounded-2xl flex items-center justify-center">
-                <Bug className="w-8 h-8 text-red-600" />
-              </div>
-              <h4 className="text-xl font-bold text-slate-900">Disease Detection</h4>
-              <p className="text-slate-600">
-                Advanced AI identifies fungal, bacterial, viral diseases and pest infestations with high accuracy
-              </p>
-            </div>
-            
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-blue-100 rounded-2xl flex items-center justify-center">
-                <Pill className="w-8 h-8 text-blue-600" />
-              </div>
-              <h4 className="text-xl font-bold text-slate-900">Smart Treatment</h4>
-              <p className="text-slate-600">
-                Get personalized organic and chemical treatment recommendations with application timing
-              </p>
-            </div>
-            
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-green-100 rounded-2xl flex items-center justify-center">
-                <Shield className="w-8 h-8 text-green-600" />
-              </div>
-              <h4 className="text-xl font-bold text-slate-900">Prevention Guide</h4>
-              <p className="text-slate-600">
-                Learn proactive measures, crop rotation tips, and monitoring strategies for healthy plants
-              </p>
-            </div>
-          </div>
-        </div>
-      </main>
+        {/* Bottom padding for FAB */}
+        <div className="h-20"></div>
+      </div>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-200/60">
-        <div className="max-w-7xl mx-auto px-6 py-8 text-center">
-          <p className="text-slate-500">
-            Powered by Advanced AI • Trusted by Farmers Worldwide
-          </p>
+      {/* Camera Modal */}
+      {showCamera && (
+        <div className="fixed inset-0 bg-black z-50 flex flex-col">
+          <div className="flex items-center justify-between p-4 bg-black/50">
+            <h3 className="text-white font-medium">Capture Plant Image</h3>
+            <Button onClick={stopCamera} variant="ghost" size="sm" className="text-white hover:bg-white/20 w-10 h-10 rounded-full p-0">
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
+          <div className="flex-1 relative">
+            <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
+            <canvas ref={canvasRef} className="hidden" />
+            <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+              <div className="w-64 h-64 border-2 border-white/60 rounded-2xl"></div>
+            </div>
+          </div>
+          <div className="p-6 bg-black/50">
+            <Button onClick={captureImage} className="w-full h-14 bg-white text-black hover:bg-gray-100 font-medium rounded-full">
+              <Camera className="w-5 h-5 mr-2" />
+              Capture
+            </Button>
+          </div>
         </div>
-      </footer>
+      )}
     </div>
   );
 };
