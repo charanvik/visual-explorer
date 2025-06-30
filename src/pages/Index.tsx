@@ -1,9 +1,9 @@
+
 import React, { useState, useCallback, useRef } from 'react';
-import { Upload, Leaf, Camera, Loader2, AlertTriangle, Shield, Pill, X, CheckCircle, AlertCircle, Sparkles, Bug, Eye } from 'lucide-react';
+import { Upload, Leaf, Camera, Loader2, AlertTriangle, Shield, Pill, X, CheckCircle, AlertCircle, Sparkles, Bug, Eye, ArrowRight, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 
 const Index = () => {
@@ -158,135 +158,133 @@ const Index = () => {
   const getSeverityBadge = (content: string) => {
     const lowerContent = content.toLowerCase();
     if (lowerContent.includes('severe')) {
-      return <Badge className="ml-2 bg-red-100 text-red-800 border-red-200">🚨 Severe</Badge>;
+      return <Badge variant="destructive" className="ml-auto">Severe</Badge>;
     }
     if (lowerContent.includes('moderate')) {
-      return <Badge className="ml-2 bg-orange-100 text-orange-800 border-orange-200">⚠️ Moderate</Badge>;
+      return <Badge className="ml-auto bg-orange-500 hover:bg-orange-600">Moderate</Badge>;
     }
     if (lowerContent.includes('mild')) {
-      return <Badge className="ml-2 bg-yellow-100 text-yellow-800 border-yellow-200">⚡ Mild</Badge>;
+      return <Badge className="ml-auto bg-yellow-500 hover:bg-yellow-600">Mild</Badge>;
     }
     if (lowerContent.includes('healthy')) {
-      return <Badge className="ml-2 bg-emerald-100 text-emerald-800 border-emerald-200">✅ Healthy</Badge>;
+      return <Badge className="ml-auto bg-green-500 hover:bg-green-600">Healthy</Badge>;
     }
     return null;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50">
-      {/* Enhanced Header */}
-      <div className="bg-white/95 backdrop-blur-md border-b border-emerald-100 sticky top-0 z-40 shadow-sm">
-        <div className="px-6 py-5">
-          <div className="flex items-center justify-center gap-3">
-            <div className="relative">
-              <div className="p-3 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl shadow-lg">
-                <Leaf className="w-7 h-7 text-white" />
+    <div className="min-h-screen bg-slate-50">
+      {/* Modern Header */}
+      <header className="bg-white border-b border-slate-200/60 sticky top-0 z-40 backdrop-blur-xl bg-white/95">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          <div className="flex items-center justify-center">
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                  <Leaf className="w-6 h-6 text-white" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
+                  <Sparkles className="w-2.5 h-2.5 text-white" />
+                </div>
               </div>
-              <div className="absolute -top-1 -right-1">
-                <Sparkles className="w-4 h-4 text-yellow-500" />
+              <div>
+                <h1 className="text-2xl font-bold text-slate-900">PlantCare AI</h1>
+                <p className="text-sm text-slate-500">Smart Disease Detection</p>
               </div>
-            </div>
-            <div className="text-center">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 bg-clip-text text-transparent">
-                PlantCare AI
-              </h1>
-              <p className="text-sm text-gray-600 mt-1">Smart Disease Detection</p>
             </div>
           </div>
-          <p className="text-center text-sm text-gray-500 mt-3 max-w-md mx-auto">
-            Professional plant health analysis powered by AI for modern farmers
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto px-6 py-8 space-y-8">
+        {/* Hero Section */}
+        <div className="text-center space-y-4 py-8">
+          <h2 className="text-4xl font-bold text-slate-900 leading-tight">
+            Diagnose Plant Issues
+            <span className="block text-emerald-600">Instantly with AI</span>
+          </h2>
+          <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            Upload or capture a photo of your plant to get professional-grade disease detection and treatment recommendations.
           </p>
         </div>
-      </div>
 
-      <div className="px-4 py-6 space-y-6 max-w-4xl mx-auto">
-        {/* Enhanced Upload Section */}
-        <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-green-500/5"></div>
-          <CardContent className="p-6 relative">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-emerald-100 rounded-xl">
-                <Upload className="w-5 h-5 text-emerald-600" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-800">Plant Analysis</h2>
-            </div>
-            
+        {/* Upload Section */}
+        <Card className="overflow-hidden border-0 shadow-xl shadow-slate-200/50">
+          <CardContent className="p-0">
             {imagePreview ? (
-              <div className="space-y-6">
-                <div className="relative group">
+              <div className="space-y-6 p-6">
+                <div className="relative">
                   <img 
                     src={imagePreview} 
                     alt="Plant preview" 
-                    className="w-full max-h-80 object-cover rounded-2xl shadow-lg border-4 border-white" 
+                    className="w-full h-80 object-cover rounded-2xl" 
                   />
-                  <div className="absolute inset-0 bg-black/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <Eye className="w-8 h-8 text-white" />
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <Button 
                     onClick={() => document.getElementById('file-input')?.click()} 
                     variant="outline" 
-                    className="border-2 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50 transition-all duration-300" 
-                    size="lg"
+                    className="flex-1 h-12 border-2"
                   >
                     <Upload className="w-4 h-4 mr-2" />
-                    New Photo
+                    Upload New Photo
                   </Button>
                   <Button 
                     onClick={startCamera} 
                     variant="outline" 
-                    className="border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50 transition-all duration-300" 
-                    size="lg"
+                    className="flex-1 h-12 border-2"
                   >
                     <Camera className="w-4 h-4 mr-2" />
-                    Camera
+                    Take Photo
                   </Button>
                 </div>
                 <Button 
                   onClick={analyzeImage} 
                   disabled={isAnalyzing} 
-                  className="w-full bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 hover:from-emerald-700 hover:via-green-700 hover:to-teal-700 text-white font-semibold py-4 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all duration-300"
-                  size="lg"
+                  className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-600/25"
                 >
                   {isAnalyzing ? (
                     <>
                       <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-                      Analyzing Plant...
+                      Analyzing...
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-5 h-5 mr-3" />
-                      Start AI Diagnosis
+                      Analyze Plant
+                      <ArrowRight className="w-5 h-5 ml-3" />
                     </>
                   )}
                 </Button>
               </div>
             ) : (
-              <div className="space-y-6">
-                <div className="border-3 border-dashed border-emerald-200 rounded-2xl p-12 text-center bg-gradient-to-br from-emerald-50/50 to-green-50/50">
-                  <div className="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-100 to-green-100 rounded-full flex items-center justify-center mb-6 shadow-lg">
-                    <Leaf className="w-10 h-10 text-emerald-600" />
+              <div className="p-8 text-center">
+                <div className="max-w-md mx-auto space-y-6">
+                  <div className="w-24 h-24 mx-auto bg-emerald-100 rounded-3xl flex items-center justify-center">
+                    <Leaf className="w-12 h-12 text-emerald-600" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Upload Plant Image</h3>
-                  <p className="text-gray-600 mb-6 max-w-sm mx-auto">
-                    Take a clear photo of affected leaves, stems, or fruits for accurate diagnosis
-                  </p>
-                  <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                  <div>
+                    <h3 className="text-2xl font-bold text-slate-900 mb-2">Upload Plant Image</h3>
+                    <p className="text-slate-600">
+                      Take a clear photo of affected leaves, stems, or fruits for accurate diagnosis
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <Button 
                       onClick={() => document.getElementById('file-input')?.click()} 
-                      className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold py-3 rounded-xl shadow-lg" 
+                      className="flex-1 h-12 bg-emerald-600 hover:bg-emerald-700"
                     >
                       <Upload className="w-4 h-4 mr-2" />
-                      Gallery
+                      Choose Photo
                     </Button>
                     <Button 
                       onClick={startCamera} 
                       variant="outline" 
-                      className="border-2 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50 font-semibold py-3 rounded-xl" 
+                      className="flex-1 h-12 border-2"
                     >
                       <Camera className="w-4 h-4 mr-2" />
-                      Camera
+                      Take Photo
                     </Button>
                   </div>
                 </div>
@@ -303,24 +301,24 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        {/* Enhanced Camera Modal */}
+        {/* Camera Modal */}
         {showCamera && (
           <div className="fixed inset-0 bg-black z-50 flex flex-col">
-            <div className="flex items-center justify-between p-6 bg-gradient-to-r from-black/80 to-black/60 backdrop-blur-sm">
-              <h3 className="text-white font-bold text-lg">📸 Capture Plant Image</h3>
-              <Button onClick={stopCamera} variant="outline" size="sm" className="text-white border-white/50 hover:bg-white/20">
-                <X className="w-4 h-4" />
+            <div className="flex items-center justify-between p-6">
+              <h3 className="text-white font-semibold text-lg">Capture Plant Image</h3>
+              <Button onClick={stopCamera} variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                <X className="w-5 h-5" />
               </Button>
             </div>
             <div className="flex-1 relative">
               <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
               <canvas ref={canvasRef} className="hidden" />
-              <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-4 border-white/50 rounded-2xl"></div>
+              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                <div className="w-64 h-64 border-2 border-white/50 rounded-3xl"></div>
               </div>
             </div>
-            <div className="p-6 bg-gradient-to-r from-black/80 to-black/60 backdrop-blur-sm">
-              <Button onClick={captureImage} className="w-full bg-white text-black hover:bg-gray-100 font-bold py-4 rounded-xl">
+            <div className="p-6">
+              <Button onClick={captureImage} className="w-full h-14 bg-white text-black hover:bg-gray-100 font-semibold rounded-2xl">
                 <Camera className="w-5 h-5 mr-3" />
                 Capture Image
               </Button>
@@ -328,152 +326,134 @@ const Index = () => {
           </div>
         )}
 
-        {/* Enhanced Loading Analysis */}
+        {/* Loading State */}
         {isAnalyzing && (
-          <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>
-            <CardContent className="p-8 relative">
-              <div className="flex flex-col items-center justify-center space-y-6">
-                <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-600 to-green-600 rounded-full flex items-center justify-center shadow-lg">
-                    <Loader2 className="w-8 h-8 text-white animate-spin" />
-                  </div>
-                  <div className="absolute -inset-2 bg-gradient-to-r from-emerald-600 to-green-600 rounded-full opacity-20 animate-pulse"></div>
+          <Card className="border-0 shadow-xl shadow-slate-200/50">
+            <CardContent className="p-12 text-center">
+              <div className="space-y-6">
+                <div className="w-16 h-16 mx-auto bg-emerald-100 rounded-full flex items-center justify-center">
+                  <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
                 </div>
-                <div className="text-center space-y-2">
-                  <p className="text-xl font-bold text-gray-800">🔍 AI Analysis in Progress</p>
-                  <p className="text-gray-600">Examining plant health and identifying potential issues...</p>
-                </div>
-                <div className="flex space-x-1">
-                  {[0, 1, 2].map((i) => (
-                    <div key={i} className={`w-2 h-2 bg-emerald-600 rounded-full animate-bounce`} style={{ animationDelay: `${i * 0.1}s` }}></div>
-                  ))}
+                <div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2">Analyzing Your Plant</h3>
+                  <p className="text-slate-600">AI is examining the image for diseases and health issues...</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         )}
 
-        {/* Enhanced Structured Analysis Results */}
+        {/* Results */}
         {analysis && !isAnalyzing && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-100 rounded-xl">
-                  <CheckCircle className="w-6 h-6 text-emerald-600" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-800">📋 Diagnosis Report</h2>
-                  <p className="text-sm text-gray-600">Comprehensive plant health analysis</p>
-                </div>
-              </div>
-              <Button 
-                onClick={analyzeImage} 
-                variant="outline" 
-                size="sm" 
-                className="border-2 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50"
-                disabled={!selectedImage}
-              >
-                <Leaf className="w-4 h-4 mr-2" />
-                Re-analyze
-              </Button>
+            <div className="text-center">
+              <h3 className="text-3xl font-bold text-slate-900 mb-2">Diagnosis Complete</h3>
+              <p className="text-slate-600">Here's what we found about your plant's health</p>
             </div>
 
-            {parseAnalysis(analysis).map((section, index) => {
-              const getIcon = (title: string) => {
-                if (title.includes('IDENTIFICATION')) return <Leaf className="w-6 h-6 text-emerald-600" />;
-                if (title.includes('DISEASE') || title.includes('ISSUE')) return <Bug className="w-6 h-6 text-red-600" />;
-                if (title.includes('SYMPTOMS')) return <AlertCircle className="w-6 h-6 text-orange-600" />;
-                if (title.includes('CAUSES')) return <AlertTriangle className="w-6 h-6 text-amber-600" />;
-                if (title.includes('TREATMENT')) return <Pill className="w-6 h-6 text-blue-600" />;
-                if (title.includes('PREVENTION')) return <Shield className="w-6 h-6 text-green-600" />;
-                if (title.includes('PROGNOSIS')) return <CheckCircle className="w-6 h-6 text-purple-600" />;
-                return <Leaf className="w-6 h-6 text-gray-600" />;
-              };
+            <div className="grid gap-6">
+              {parseAnalysis(analysis).map((section, index) => {
+                const getIcon = (title: string) => {
+                  if (title.includes('IDENTIFICATION')) return <Leaf className="w-5 h-5 text-emerald-600" />;
+                  if (title.includes('DISEASE') || title.includes('ISSUE')) return <Bug className="w-5 h-5 text-red-600" />;
+                  if (title.includes('SYMPTOMS')) return <AlertCircle className="w-5 h-5 text-orange-600" />;
+                  if (title.includes('CAUSES')) return <AlertTriangle className="w-5 h-5 text-amber-600" />;
+                  if (title.includes('TREATMENT')) return <Pill className="w-5 h-5 text-blue-600" />;
+                  if (title.includes('PREVENTION')) return <Shield className="w-5 h-5 text-green-600" />;
+                  if (title.includes('PROGNOSIS')) return <CheckCircle className="w-5 h-5 text-purple-600" />;
+                  return <Leaf className="w-5 h-5 text-slate-600" />;
+                };
 
-              const getGradient = (title: string) => {
-                if (title.includes('DISEASE') || title.includes('TREATMENT')) return 'from-red-500/10 to-pink-500/10';
-                if (title.includes('PREVENTION')) return 'from-green-500/10 to-emerald-500/10';
-                if (title.includes('IDENTIFICATION')) return 'from-blue-500/10 to-cyan-500/10';
-                return 'from-gray-500/10 to-slate-500/10';
-              };
+                const isHighPriority = section.title.includes('DISEASE') || section.title.includes('TREATMENT');
 
-              const isHighPriority = section.title.includes('DISEASE') || section.title.includes('TREATMENT');
-
-              return (
-                <Card key={index} className={`border-0 shadow-lg bg-white/95 backdrop-blur-sm overflow-hidden transform hover:scale-[1.01] transition-all duration-300 ${isHighPriority ? 'ring-2 ring-red-200' : ''}`}>
-                  <div className={`absolute inset-0 bg-gradient-to-br ${getGradient(section.title)}`}></div>
-                  <CardHeader className="pb-4 relative">
-                    <CardTitle className="flex items-center text-lg font-bold text-gray-800">
-                      <div className="p-2 bg-white rounded-xl shadow-sm mr-3">
-                        {getIcon(section.title)}
+                return (
+                  <Card key={index} className={`border-0 shadow-lg shadow-slate-200/50 ${isHighPriority ? 'ring-2 ring-red-100' : ''}`}>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center">
+                            {getIcon(section.title)}
+                          </div>
+                          <h4 className="font-bold text-slate-900">{section.title}</h4>
+                        </div>
+                        {section.title.includes('DISEASE') && getSeverityBadge(section.content)}
                       </div>
-                      <span>{section.title}</span>
-                      {section.title.includes('DISEASE') && getSeverityBadge(section.content)}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0 relative">
-                    <div className="text-sm text-gray-700 leading-relaxed space-y-3">
-                      {section.content.split('\n').map((line, lineIndex) => {
-                        if (line.trim().startsWith('-')) {
-                          return (
-                            <div key={lineIndex} className="flex items-start gap-3 p-3 bg-white/60 rounded-xl">
-                              <span className="text-emerald-600 mt-1 text-lg">•</span>
-                              <span className="flex-1">{line.trim().substring(1).trim()}</span>
-                            </div>
-                          );
-                        }
-                        return line.trim() ? (
-                          <p key={lineIndex} className="font-semibold text-gray-800 bg-white/40 rounded-lg p-3">
-                            {line.trim()}
-                          </p>
-                        ) : null;
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                      <div className="prose prose-slate max-w-none">
+                        {section.content.split('\n').map((line, lineIndex) => {
+                          if (line.trim().startsWith('-')) {
+                            return (
+                              <div key={lineIndex} className="flex items-start space-x-3 py-2">
+                                <div className="w-2 h-2 bg-emerald-500 rounded-full mt-2 flex-shrink-0"></div>
+                                <span className="text-slate-700">{line.trim().substring(1).trim()}</span>
+                              </div>
+                            );
+                          }
+                          return line.trim() ? (
+                            <p key={lineIndex} className="font-medium text-slate-800 mb-2">
+                              {line.trim()}
+                            </p>
+                          ) : null;
+                        })}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
         )}
 
-        {/* Enhanced Features Section */}
-        <div className="mt-12">
-          <h3 className="text-center text-xl font-bold text-gray-800 mb-6">🌟 Why Choose PlantCare AI?</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg transform hover:scale-105 transition-all duration-300">
-              <div className="w-14 h-14 bg-gradient-to-br from-red-100 to-pink-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Bug className="w-7 h-7 text-red-600" />
+        {/* Features Section */}
+        <div className="py-16">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-slate-900 mb-4">Why Choose PlantCare AI?</h3>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+              Professional-grade plant disease detection powered by advanced AI technology
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 mx-auto bg-red-100 rounded-2xl flex items-center justify-center">
+                <Bug className="w-8 h-8 text-red-600" />
               </div>
-              <h4 className="font-bold text-gray-800 mb-3 text-center">🔍 Disease Detection</h4>
-              <p className="text-sm text-gray-600 text-center">Advanced AI identifies fungal, bacterial, viral diseases and pest infestations with high accuracy</p>
+              <h4 className="text-xl font-bold text-slate-900">Disease Detection</h4>
+              <p className="text-slate-600">
+                Advanced AI identifies fungal, bacterial, viral diseases and pest infestations with high accuracy
+              </p>
             </div>
             
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg transform hover:scale-105 transition-all duration-300">
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Pill className="w-7 h-7 text-blue-600" />
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 mx-auto bg-blue-100 rounded-2xl flex items-center justify-center">
+                <Pill className="w-8 h-8 text-blue-600" />
               </div>
-              <h4 className="font-bold text-gray-800 mb-3 text-center">💊 Smart Treatment</h4>
-              <p className="text-sm text-gray-600 text-center">Get personalized organic and chemical treatment recommendations with application timing</p>
+              <h4 className="text-xl font-bold text-slate-900">Smart Treatment</h4>
+              <p className="text-slate-600">
+                Get personalized organic and chemical treatment recommendations with application timing
+              </p>
             </div>
             
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg transform hover:scale-105 transition-all duration-300">
-              <div className="w-14 h-14 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-7 h-7 text-green-600" />
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 mx-auto bg-green-100 rounded-2xl flex items-center justify-center">
+                <Shield className="w-8 h-8 text-green-600" />
               </div>
-              <h4 className="font-bold text-gray-800 mb-3 text-center">🛡️ Prevention Guide</h4>
-              <p className="text-sm text-gray-600 text-center">Learn proactive measures, crop rotation tips, and monitoring strategies for healthy plants</p>
+              <h4 className="text-xl font-bold text-slate-900">Prevention Guide</h4>
+              <p className="text-slate-600">
+                Learn proactive measures, crop rotation tips, and monitoring strategies for healthy plants
+              </p>
             </div>
           </div>
         </div>
+      </main>
 
-        {/* Footer */}
-        <div className="text-center py-8">
-          <p className="text-sm text-gray-500">
-            Powered by Advanced AI • Trusted by Farmers Worldwide 🌱
+      {/* Footer */}
+      <footer className="bg-white border-t border-slate-200/60">
+        <div className="max-w-7xl mx-auto px-6 py-8 text-center">
+          <p className="text-slate-500">
+            Powered by Advanced AI • Trusted by Farmers Worldwide
           </p>
         </div>
-      </div>
+      </footer>
     </div>
   );
 };
