@@ -178,8 +178,8 @@ const Index = () => {
         <Card className="bg-white rounded-lg shadow-sm border-0 overflow-hidden">
           <CardContent className="p-6">
             <div className="flex items-center space-x-4 mb-4">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <Leaf className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 rounded-full flex items-center justify-center bg-white">
+                <Leaf className="w-6 h-6 text-green-600 bg-transparent" />
               </div>
               <div>
                 <h2 className="text-xl font-medium text-gray-900">AI Plant Doctor</h2>
