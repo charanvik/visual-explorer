@@ -1,6 +1,5 @@
-
 import React, { useState, useCallback, useRef } from 'react';
-import { Upload, Leaf, Camera, Loader2, AlertTriangle, Shield, Pill, X, CheckCircle, AlertCircle, Bug, Menu, Search, MoreVert } from 'lucide-react';
+import { Upload, Leaf, Camera, Loader2, AlertTriangle, Shield, Pill, X, CheckCircle, AlertCircle, Bug, Menu, Search, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -186,7 +185,7 @@ const Index = () => {
           </div>
           <div className="flex items-center space-x-2">
             <Search className="w-6 h-6" />
-            <MoreVert className="w-6 h-6" />
+            <MoreVertical className="w-6 h-6" />
           </div>
         </div>
       </div>
