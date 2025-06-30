@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-
 const Index = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -14,7 +13,6 @@ const Index = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-
   const handleImageUpload = useCallback((file: File) => {
     if (!file.type.startsWith('image/')) {
       toast.error('Please select a valid image file');
@@ -28,21 +26,23 @@ const Index = () => {
     reader.readAsDataURL(file);
     setAnalysis(null);
   }, []);
-
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       handleImageUpload(file);
     }
   };
-
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
+          width: {
+            ideal: 1280
+          },
+          height: {
+            ideal: 720
+          }
         }
       });
       streamRef.current = stream;
@@ -56,7 +56,6 @@ const Index = () => {
       toast.error('Could not access camera. Please check permissions.');
     }
   };
-
   const stopCamera = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
@@ -64,7 +63,6 @@ const Index = () => {
     }
     setShowCamera(false);
   };
-
   const captureImage = () => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
@@ -76,7 +74,9 @@ const Index = () => {
         ctx.drawImage(video, 0, 0);
         canvas.toBlob(blob => {
           if (blob) {
-            const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
+            const file = new File([blob], 'camera-capture.jpg', {
+              type: 'image/jpeg'
+            });
             handleImageUpload(file);
             stopCamera();
           }
@@ -84,7 +84,6 @@ const Index = () => {
       }
     }
   };
-
   const analyzeImage = async () => {
     if (!selectedImage) {
       toast.error('Please select a plant image first');
@@ -100,10 +99,11 @@ const Index = () => {
         };
         reader.readAsDataURL(selectedImage);
       });
-
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCorMyOjbOOJDcPkWzz0UzPTKoPEM74z4g`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
           contents: [{
             parts: [{
@@ -117,14 +117,11 @@ const Index = () => {
           }]
         })
       });
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       const data = await response.json();
       const analysisText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      
       if (analysisText) {
         setAnalysis(analysisText);
         toast.success('Analysis completed successfully!');
@@ -138,11 +135,12 @@ const Index = () => {
       setIsAnalyzing(false);
     }
   };
-
   const parseAnalysis = (text: string) => {
     const sections = text.split('**').filter(section => section.trim());
-    const parsedSections: { title: string; content: string; }[] = [];
-    
+    const parsedSections: {
+      title: string;
+      content: string;
+    }[] = [];
     for (let i = 0; i < sections.length; i += 2) {
       if (sections[i] && sections[i + 1]) {
         parsedSections.push({
@@ -153,7 +151,6 @@ const Index = () => {
     }
     return parsedSections;
   };
-
   const getSeverityBadge = (content: string) => {
     const lowerContent = content.toLowerCase();
     if (lowerContent.includes('severe')) {
@@ -170,24 +167,10 @@ const Index = () => {
     }
     return null;
   };
-
-  return (
-    <div className="min-h-screen bg-gray-50">
+  return <div className="min-h-screen bg-gray-50">
       {/* Android-style Status Bar & App Bar */}
       <div className="bg-green-600 text-white">
-        <div className="flex items-center justify-between px-4 py-3 pt-8">
-          <div className="flex items-center space-x-3">
-            <Menu className="w-6 h-6" />
-            <div>
-              <h1 className="text-lg font-medium">PlantCare</h1>
-              <p className="text-xs opacity-90">Disease Detection</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Search className="w-6 h-6" />
-            <MoreVertical className="w-6 h-6" />
-          </div>
-        </div>
+        
       </div>
 
       <div className="px-4 py-6 space-y-4">
@@ -212,47 +195,31 @@ const Index = () => {
         {/* Image Upload Card */}
         <Card className="bg-white rounded-lg shadow-sm border-0">
           <CardContent className="p-0">
-            {imagePreview ? (
-              <div className="space-y-4 p-4">
+            {imagePreview ? <div className="space-y-4 p-4">
                 <div className="relative rounded-lg overflow-hidden">
-                  <img 
-                    src={imagePreview} 
-                    alt="Plant preview" 
-                    className="w-full h-64 object-cover" 
-                  />
+                  <img src={imagePreview} alt="Plant preview" className="w-full h-64 object-cover" />
                   <div className="absolute top-2 right-2">
-                    <Button 
-                      onClick={() => {setImagePreview(null); setSelectedImage(null); setAnalysis(null);}}
-                      size="sm"
-                      variant="secondary"
-                      className="w-8 h-8 rounded-full p-0 bg-black/20 border-0 text-white hover:bg-black/40"
-                    >
+                    <Button onClick={() => {
+                  setImagePreview(null);
+                  setSelectedImage(null);
+                  setAnalysis(null);
+                }} size="sm" variant="secondary" className="w-8 h-8 rounded-full p-0 bg-black/20 border-0 text-white hover:bg-black/40">
                       <X className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">
-                  <Button 
-                    onClick={() => document.getElementById('file-input')?.click()} 
-                    variant="outline" 
-                    className="h-12 border border-gray-300 rounded-lg"
-                  >
+                  <Button onClick={() => document.getElementById('file-input')?.click()} variant="outline" className="h-12 border border-gray-300 rounded-lg">
                     <Upload className="w-4 h-4 mr-2" />
                     Replace
                   </Button>
-                  <Button 
-                    onClick={startCamera} 
-                    variant="outline" 
-                    className="h-12 border border-gray-300 rounded-lg"
-                  >
+                  <Button onClick={startCamera} variant="outline" className="h-12 border border-gray-300 rounded-lg">
                     <Camera className="w-4 h-4 mr-2" />
                     Camera
                   </Button>
                 </div>
-              </div>
-            ) : (
-              <div className="p-8 text-center">
+              </div> : <div className="p-8 text-center">
                 <div className="w-20 h-20 mx-auto mb-6 bg-green-50 rounded-full flex items-center justify-center">
                   <Leaf className="w-10 h-10 text-green-600" />
                 </div>
@@ -261,54 +228,29 @@ const Index = () => {
                   Take a clear photo of affected leaves or upload from gallery
                 </p>
                 <div className="grid grid-cols-2 gap-3">
-                  <Button 
-                    onClick={() => document.getElementById('file-input')?.click()} 
-                    className="h-12 bg-green-600 hover:bg-green-700 text-white rounded-lg"
-                  >
+                  <Button onClick={() => document.getElementById('file-input')?.click()} className="h-12 bg-green-600 hover:bg-green-700 text-white rounded-lg">
                     <Upload className="w-4 h-4 mr-2" />
                     Gallery
                   </Button>
-                  <Button 
-                    onClick={startCamera} 
-                    variant="outline" 
-                    className="h-12 border border-gray-300 rounded-lg"
-                  >
+                  <Button onClick={startCamera} variant="outline" className="h-12 border border-gray-300 rounded-lg">
                     <Camera className="w-4 h-4 mr-2" />
                     Camera
                   </Button>
                 </div>
-              </div>
-            )}
-            <input 
-              id="file-input" 
-              type="file" 
-              accept="image/*" 
-              onChange={handleFileInput} 
-              className="hidden" 
-            />
+              </div>}
+            <input id="file-input" type="file" accept="image/*" onChange={handleFileInput} className="hidden" />
           </CardContent>
         </Card>
 
         {/* Analyze Button - Floating Action Button Style */}
-        {selectedImage && !analysis && (
-          <div className="fixed bottom-6 right-4 z-40">
-            <Button 
-              onClick={analyzeImage} 
-              disabled={isAnalyzing} 
-              className="w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg border-0 p-0"
-            >
-              {isAnalyzing ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
-              ) : (
-                <Bug className="w-6 h-6" />
-              )}
+        {selectedImage && !analysis && <div className="fixed bottom-6 right-4 z-40">
+            <Button onClick={analyzeImage} disabled={isAnalyzing} className="w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg border-0 p-0">
+              {isAnalyzing ? <Loader2 className="w-6 h-6 animate-spin" /> : <Bug className="w-6 h-6" />}
             </Button>
-          </div>
-        )}
+          </div>}
 
         {/* Loading State */}
-        {isAnalyzing && (
-          <Card className="bg-white rounded-lg shadow-sm border-0">
+        {isAnalyzing && <Card className="bg-white rounded-lg shadow-sm border-0">
             <CardContent className="p-6 text-center">
               <div className="w-12 h-12 mx-auto mb-4 bg-green-50 rounded-full flex items-center justify-center">
                 <Loader2 className="w-6 h-6 text-green-600 animate-spin" />
@@ -316,33 +258,28 @@ const Index = () => {
               <h3 className="text-lg font-medium text-gray-900 mb-2">Analyzing...</h3>
               <p className="text-gray-600 text-sm">AI is examining your plant for diseases</p>
             </CardContent>
-          </Card>
-        )}
+          </Card>}
 
         {/* Results */}
-        {analysis && !isAnalyzing && (
-          <div className="space-y-4">
+        {analysis && !isAnalyzing && <div className="space-y-4">
             <div className="text-center py-4">
               <h3 className="text-xl font-medium text-gray-900 mb-1">Analysis Complete</h3>
               <p className="text-gray-600 text-sm">Here's what we found</p>
             </div>
 
             {parseAnalysis(analysis).map((section, index) => {
-              const getIcon = (title: string) => {
-                if (title.includes('IDENTIFICATION')) return <Leaf className="w-5 h-5 text-green-600" />;
-                if (title.includes('DISEASE') || title.includes('ISSUE')) return <Bug className="w-5 h-5 text-red-600" />;
-                if (title.includes('SYMPTOMS')) return <AlertCircle className="w-5 h-5 text-orange-600" />;
-                if (title.includes('CAUSES')) return <AlertTriangle className="w-5 h-5 text-amber-600" />;
-                if (title.includes('TREATMENT')) return <Pill className="w-5 h-5 text-blue-600" />;
-                if (title.includes('PREVENTION')) return <Shield className="w-5 h-5 text-green-600" />;
-                if (title.includes('PROGNOSIS')) return <CheckCircle className="w-5 h-5 text-purple-600" />;
-                return <Leaf className="w-5 h-5 text-gray-600" />;
-              };
-
-              const isHighPriority = section.title.includes('DISEASE') || section.title.includes('TREATMENT');
-
-              return (
-                <Card key={index} className={`bg-white rounded-lg shadow-sm border-0 ${isHighPriority ? 'ring-1 ring-red-200' : ''}`}>
+          const getIcon = (title: string) => {
+            if (title.includes('IDENTIFICATION')) return <Leaf className="w-5 h-5 text-green-600" />;
+            if (title.includes('DISEASE') || title.includes('ISSUE')) return <Bug className="w-5 h-5 text-red-600" />;
+            if (title.includes('SYMPTOMS')) return <AlertCircle className="w-5 h-5 text-orange-600" />;
+            if (title.includes('CAUSES')) return <AlertTriangle className="w-5 h-5 text-amber-600" />;
+            if (title.includes('TREATMENT')) return <Pill className="w-5 h-5 text-blue-600" />;
+            if (title.includes('PREVENTION')) return <Shield className="w-5 h-5 text-green-600" />;
+            if (title.includes('PROGNOSIS')) return <CheckCircle className="w-5 h-5 text-purple-600" />;
+            return <Leaf className="w-5 h-5 text-gray-600" />;
+          };
+          const isHighPriority = section.title.includes('DISEASE') || section.title.includes('TREATMENT');
+          return <Card key={index} className={`bg-white rounded-lg shadow-sm border-0 ${isHighPriority ? 'ring-1 ring-red-200' : ''}`}>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-3">
@@ -355,35 +292,28 @@ const Index = () => {
                     </div>
                     <div className="ml-13 space-y-2">
                       {section.content.split('\n').map((line, lineIndex) => {
-                        if (line.trim().startsWith('-')) {
-                          return (
-                            <div key={lineIndex} className="flex items-start space-x-2 py-1">
+                  if (line.trim().startsWith('-')) {
+                    return <div key={lineIndex} className="flex items-start space-x-2 py-1">
                               <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
                               <span className="text-gray-700 text-sm leading-relaxed">{line.trim().substring(1).trim()}</span>
-                            </div>
-                          );
-                        }
-                        return line.trim() ? (
-                          <p key={lineIndex} className="font-medium text-gray-800 text-sm mb-1">
+                            </div>;
+                  }
+                  return line.trim() ? <p key={lineIndex} className="font-medium text-gray-800 text-sm mb-1">
                             {line.trim()}
-                          </p>
-                        ) : null;
-                      })}
+                          </p> : null;
+                })}
                     </div>
                   </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        )}
+                </Card>;
+        })}
+          </div>}
 
         {/* Bottom padding for FAB */}
         <div className="h-20"></div>
       </div>
 
       {/* Camera Modal */}
-      {showCamera && (
-        <div className="fixed inset-0 bg-black z-50 flex flex-col">
+      {showCamera && <div className="fixed inset-0 bg-black z-50 flex flex-col">
           <div className="flex items-center justify-between p-4 bg-black/50">
             <h3 className="text-white font-medium">Capture Plant Image</h3>
             <Button onClick={stopCamera} variant="ghost" size="sm" className="text-white hover:bg-white/20 w-10 h-10 rounded-full p-0">
@@ -403,10 +333,7 @@ const Index = () => {
               Capture
             </Button>
           </div>
-        </div>
-      )}
-    </div>
-  );
+        </div>}
+    </div>;
 };
-
 export default Index;
