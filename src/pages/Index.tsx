@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useRef } from 'react';
 import { Upload, Leaf, Camera, Loader2, AlertTriangle, Shield, Pill, X, CheckCircle, AlertCircle, Bug, ArrowLeft, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -221,7 +222,7 @@ const Index = () => {
                 <div 
                   className="w-full h-full bg-cover bg-center flex items-center justify-center"
                   style={{
-                    backgroundImage: "url('/lovable-uploads/afe225e5-f782-4111-b578-cc2a2ba66977.png')"
+                    backgroundImage: "url('/lovable-uploads/f2eec247-bb25-4be8-83aa-3017a363a55f.png')"
                   }}
                 >
                   <div className="bg-black/50 backdrop-blur-sm rounded-2xl p-8 flex gap-6">
