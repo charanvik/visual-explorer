@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useRef } from 'react';
 import { Upload, Leaf, Camera, Loader2, AlertTriangle, Shield, Pill, X, CheckCircle, AlertCircle, Bug, ArrowLeft, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -241,9 +242,9 @@ const Index = () => {
                         className="flex flex-col items-center gap-3 text-white hover:scale-105 transition-transform"
                       >
                         <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
-                          <Video className="w-8 h-8" />
+                          <Camera className="w-8 h-8" />
                         </div>
-                        <span className="font-medium">Upload Video</span>
+                        <span className="font-medium">Take Photo</span>
                       </button>
                     </div>
                   </div>
@@ -286,7 +287,7 @@ const Index = () => {
         <div className="text-center space-y-4">
           <h2 className="text-2xl font-bold text-gray-900">For Gardeners and Farmers</h2>
           <p className="text-gray-600 text-lg leading-relaxed px-2">
-            Upload a picture or video of your plant to identify diseases and get treatment recommendations.
+            Upload a picture of your plant to identify diseases and get treatment recommendations.
           </p>
         </div>
 
