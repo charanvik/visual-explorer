@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useRef } from 'react';
 import { Upload, Leaf, Camera, Loader2, AlertTriangle, Shield, Pill, X, CheckCircle, AlertCircle, Bug, ArrowLeft, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -181,7 +180,27 @@ const Index = () => {
         {/* Main Upload Card */}
         <Card className="bg-white rounded-2xl shadow-sm border-0 overflow-hidden">
           <CardContent className="p-0">
-            {imagePreview ? (
+            {showCamera ? (
+              <div className="relative h-80 rounded-2xl overflow-hidden">
+                <video 
+                  ref={videoRef} 
+                  className="w-full h-full object-cover" 
+                  playsInline 
+                  muted 
+                  autoPlay
+                />
+                <canvas ref={canvasRef} className="hidden" />
+                <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                  <div className="w-48 h-48 border-2 border-white/80 rounded-xl"></div>
+                </div>
+                <Button 
+                  onClick={stopCamera}
+                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 text-white p-0"
+                >
+                  <X className="w-5 h-5" />
+                </Button>
+              </div>
+            ) : imagePreview ? (
               <div className="relative">
                 <img src={imagePreview} alt="Plant preview" className="w-full h-64 object-cover rounded-2xl" />
                 <Button 
@@ -199,56 +218,34 @@ const Index = () => {
               </div>
             ) : (
               <div className="relative h-80 rounded-2xl overflow-hidden">
-                {showCamera ? (
-                  <div className="relative w-full h-full">
-                    <video 
-                      ref={videoRef} 
-                      className="w-full h-full object-cover" 
-                      playsInline 
-                      muted 
-                      autoPlay
-                    />
-                    <canvas ref={canvasRef} className="hidden" />
-                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                      <div className="w-48 h-48 border-2 border-white/80 rounded-xl"></div>
-                    </div>
-                    <Button 
-                      onClick={stopCamera}
-                      className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 text-white p-0"
+                <div 
+                  className="w-full h-full bg-cover bg-center flex items-center justify-center"
+                  style={{
+                    backgroundImage: "url('/lovable-uploads/afe225e5-f782-4111-b578-cc2a2ba66977.png')"
+                  }}
+                >
+                  <div className="bg-black/50 backdrop-blur-sm rounded-2xl p-8 flex gap-6">
+                    <button
+                      onClick={() => document.getElementById('file-input')?.click()}
+                      className="flex flex-col items-center gap-3 text-white hover:scale-105 transition-transform"
                     >
-                      <X className="w-5 h-5" />
-                    </Button>
+                      <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
+                        <Upload className="w-8 h-8" />
+                      </div>
+                      <span className="font-medium">Upload Image</span>
+                    </button>
+                    
+                    <button
+                      onClick={startCamera}
+                      className="flex flex-col items-center gap-3 text-white hover:scale-105 transition-transform"
+                    >
+                      <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
+                        <Camera className="w-8 h-8" />
+                      </div>
+                      <span className="font-medium">Take Photo</span>
+                    </button>
                   </div>
-                ) : (
-                  <div 
-                    className="w-full h-full bg-cover bg-center flex items-center justify-center"
-                    style={{
-                      backgroundImage: "url('/lovable-uploads/afe225e5-f782-4111-b578-cc2a2ba66977.png')"
-                    }}
-                  >
-                    <div className="bg-black/50 backdrop-blur-sm rounded-2xl p-8 flex gap-6">
-                      <button
-                        onClick={() => document.getElementById('file-input')?.click()}
-                        className="flex flex-col items-center gap-3 text-white hover:scale-105 transition-transform"
-                      >
-                        <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
-                          <Upload className="w-8 h-8" />
-                        </div>
-                        <span className="font-medium">Upload Image</span>
-                      </button>
-                      
-                      <button
-                        onClick={startCamera}
-                        className="flex flex-col items-center gap-3 text-white hover:scale-105 transition-transform"
-                      >
-                        <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
-                          <Camera className="w-8 h-8" />
-                        </div>
-                        <span className="font-medium">Take Photo</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             )}
             <input id="file-input" type="file" accept="image/*" onChange={handleFileInput} className="hidden" />
