@@ -198,7 +198,7 @@ const Index = () => {
                 </Button>
               </div> : <div className="relative h-80 rounded-2xl overflow-hidden">
                 <div className="w-full h-full bg-cover bg-center flex items-center justify-center" style={{
-              backgroundImage: "url('/lovable-uploads/f2eec247-bb25-4be8-83aa-3017a363a55f.png')"
+              backgroundImage: "url('/lovable-uploads/8ed8f311-bd71-4966-9941-69370f7cfd2e.png')"
             }}>
                   <div className="bg-black/50 backdrop-blur-sm rounded-2xl p-8 flex gap-6">
                     <button onClick={() => document.getElementById('file-input')?.click()} className="flex flex-col items-center gap-3 text-white hover:scale-105 transition-transform">
