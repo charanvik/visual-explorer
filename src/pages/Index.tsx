@@ -336,7 +336,7 @@ const Index = () => {
 
         {/* Info Section */}
         <div className="text-center space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">For Gardeners and Farmers</h2>
+          
           <p className="text-gray-600 text-lg leading-relaxed px-2">
             Upload a picture of your plant to identify diseases and get treatment recommendations.
           </p>
