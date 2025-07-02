@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useRef } from 'react';
 import { Upload, Leaf, Camera, Loader2, AlertTriangle, Shield, Pill, X, CheckCircle, AlertCircle, Bug, ArrowLeft, Video, Copy, Clock, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -479,7 +480,7 @@ const Index = () => {
                           </div>
                           {renderStructuredContent(section.content)}
                         </CardContent>
-                      </div>
+                      </Card>
                     ))}
                   </div>
                 </div>
