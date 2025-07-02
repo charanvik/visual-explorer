@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useRef } from 'react';
 import { Upload, Leaf, Camera, Loader2, AlertTriangle, Shield, Pill, X, CheckCircle, AlertCircle, Bug, ArrowLeft, Video, Copy, Clock, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -276,6 +277,11 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white px-4 py-4 flex items-center shadow-sm">
+        <img 
+          src="/lovable-uploads/0b150c40-a73b-479d-9cce-d0ffa6576f85.png" 
+          alt="Kisan-G Logo" 
+          className="h-8 mr-3"
+        />
         <h1 className="text-xl font-medium text-lime-500">Plant Disease Diagnosis</h1>
       </div>
 
