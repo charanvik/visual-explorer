@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+
 const Index = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -13,6 +14,7 @@ const Index = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+
   const handleImageUpload = useCallback((file: File) => {
     if (!file.type.startsWith('image/')) {
       toast.error('Please select a valid image file');
@@ -26,23 +28,21 @@ const Index = () => {
     reader.readAsDataURL(file);
     setAnalysis(null);
   }, []);
+
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       handleImageUpload(file);
     }
   };
+
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
-          width: {
-            ideal: 1280
-          },
-          height: {
-            ideal: 720
-          }
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
         }
       });
       streamRef.current = stream;
@@ -56,6 +56,7 @@ const Index = () => {
       toast.error('Could not access camera. Please check permissions.');
     }
   };
+
   const stopCamera = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
@@ -63,6 +64,7 @@ const Index = () => {
     }
     setShowCamera(false);
   };
+
   const captureImage = () => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
@@ -74,9 +76,7 @@ const Index = () => {
         ctx.drawImage(video, 0, 0);
         canvas.toBlob(blob => {
           if (blob) {
-            const file = new File([blob], 'camera-capture.jpg', {
-              type: 'image/jpeg'
-            });
+            const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
             handleImageUpload(file);
             stopCamera();
           }
@@ -84,6 +84,7 @@ const Index = () => {
       }
     }
   };
+
   const analyzeImage = async () => {
     if (!selectedImage) {
       toast.error('Please select a plant image first');
@@ -101,9 +102,7 @@ const Index = () => {
       });
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCorMyOjbOOJDcPkWzz0UzPTKoPEM74z4g`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{
             parts: [{
@@ -135,22 +134,32 @@ const Index = () => {
       setIsAnalyzing(false);
     }
   };
+
   const parseAnalysis = (text: string) => {
     const sections = text.split('**').filter(section => section.trim());
-    const parsedSections: {
-      title: string;
-      content: string;
-    }[] = [];
+    const parsedSections: { title: string; content: string; }[] = [];
+    
     for (let i = 0; i < sections.length; i += 2) {
       if (sections[i] && sections[i + 1]) {
+        const title = sections[i].replace(':', '').trim();
+        const content = sections[i + 1].trim();
+        
+        // Structure the content better
+        const structuredContent = content
+          .split('\n')
+          .filter(line => line.trim())
+          .map(line => line.trim())
+          .join('\n');
+        
         parsedSections.push({
-          title: sections[i].replace(':', '').trim(),
-          content: sections[i + 1].trim()
+          title,
+          content: structuredContent
         });
       }
     }
     return parsedSections;
   };
+
   const getSeverityBadge = (content: string) => {
     const lowerContent = content.toLowerCase();
     if (lowerContent.includes('severe')) {
@@ -167,10 +176,52 @@ const Index = () => {
     }
     return null;
   };
-  return <div className="min-h-screen bg-gray-50">
+
+  const getIcon = (title: string) => {
+    if (title.includes('IDENTIFICATION')) return <Leaf className="w-5 h-5 text-green-600" />;
+    if (title.includes('DISEASE') || title.includes('ISSUE')) return <Bug className="w-5 h-5 text-red-600" />;
+    if (title.includes('SYMPTOMS')) return <AlertCircle className="w-5 h-5 text-orange-600" />;
+    if (title.includes('CAUSES')) return <AlertTriangle className="w-5 h-5 text-amber-600" />;
+    if (title.includes('TREATMENT')) return <Pill className="w-5 h-5 text-blue-600" />;
+    if (title.includes('PREVENTION')) return <Shield className="w-5 h-5 text-green-600" />;
+    if (title.includes('PROGNOSIS')) return <CheckCircle className="w-5 h-5 text-purple-600" />;
+    return <Leaf className="w-5 h-5 text-gray-600" />;
+  };
+
+  const renderStructuredContent = (content: string) => {
+    const lines = content.split('\n').filter(line => line.trim());
+    
+    return (
+      <div className="space-y-3">
+        {lines.map((line, index) => {
+          if (line.trim().startsWith('-')) {
+            return (
+              <div key={index} className="flex items-start space-x-3 py-1">
+                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                <span className="text-gray-700 text-sm leading-relaxed flex-1">
+                  {line.trim().substring(1).trim()}
+                </span>
+              </div>
+            );
+          } else if (line.trim()) {
+            return (
+              <div key={index} className="mb-2">
+                <p className="font-medium text-gray-800 text-sm leading-relaxed">
+                  {line.trim()}
+                </p>
+              </div>
+            );
+          }
+          return null;
+        })}
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white px-4 py-4 flex items-center shadow-sm">
-        
         <h1 className="text-xl font-medium text-lime-500">Plant Disease Diagnosis</h1>
       </div>
 
@@ -178,7 +229,8 @@ const Index = () => {
         {/* Main Upload Card */}
         <Card className="bg-white rounded-2xl shadow-sm border-0 overflow-hidden">
           <CardContent className="p-0">
-            {showCamera ? <div className="relative h-80 rounded-2xl overflow-hidden">
+            {showCamera ? (
+              <div className="relative h-80 rounded-2xl overflow-hidden">
                 <video ref={videoRef} className="w-full h-full object-cover" playsInline muted autoPlay />
                 <canvas ref={canvasRef} className="hidden" />
                 <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
@@ -187,19 +239,28 @@ const Index = () => {
                 <Button onClick={stopCamera} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 text-white p-0">
                   <X className="w-5 h-5" />
                 </Button>
-              </div> : imagePreview ? <div className="relative">
+              </div>
+            ) : imagePreview ? (
+              <div className="relative">
                 <img src={imagePreview} alt="Plant preview" className="w-full h-64 object-cover rounded-2xl" />
-                <Button onClick={() => {
-              setImagePreview(null);
-              setSelectedImage(null);
-              setAnalysis(null);
-            }} size="sm" variant="secondary" className="absolute top-4 right-4 w-8 h-8 rounded-full p-0 bg-black/40 border-0 text-white hover:bg-black/60">
+                <Button 
+                  onClick={() => {
+                    setImagePreview(null);
+                    setSelectedImage(null);
+                    setAnalysis(null);
+                  }} 
+                  size="sm" 
+                  variant="secondary" 
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full p-0 bg-black/40 border-0 text-white hover:bg-black/60"
+                >
                   <X className="w-4 h-4" />
                 </Button>
-              </div> : <div className="relative h-80 rounded-2xl overflow-hidden">
+              </div>
+            ) : (
+              <div className="relative h-80 rounded-2xl overflow-hidden">
                 <div className="w-full h-full bg-cover bg-center flex items-center justify-center" style={{
-              backgroundImage: "url('/lovable-uploads/8ed8f311-bd71-4966-9941-69370f7cfd2e.png')"
-            }}>
+                  backgroundImage: "url('/lovable-uploads/8ed8f311-bd71-4966-9941-69370f7cfd2e.png')"
+                }}>
                   <div className="bg-black/50 backdrop-blur-sm rounded-2xl p-8 flex gap-6">
                     <button onClick={() => document.getElementById('file-input')?.click()} className="flex flex-col items-center gap-3 text-white hover:scale-105 transition-transform">
                       <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
@@ -216,23 +277,32 @@ const Index = () => {
                     </button>
                   </div>
                 </div>
-              </div>}
+              </div>
+            )}
             <input id="file-input" type="file" accept="image/*" onChange={handleFileInput} className="hidden" />
           </CardContent>
         </Card>
 
         {/* Capture/Analyze Button */}
-        {showCamera && <Button onClick={captureImage} className="w-full h-14 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-medium text-lg">
+        {showCamera && (
+          <Button onClick={captureImage} className="w-full h-14 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-medium text-lg">
             <Camera className="w-6 h-6 mr-3" />
             Capture Image
-          </Button>}
+          </Button>
+        )}
 
-        {selectedImage && !showCamera && <Button onClick={analyzeImage} disabled={isAnalyzing} className="w-full h-14 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-medium text-lg disabled:opacity-50">
-            {isAnalyzing ? <>
+        {selectedImage && !showCamera && (
+          <Button onClick={analyzeImage} disabled={isAnalyzing} className="w-full h-14 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-medium text-lg disabled:opacity-50">
+            {isAnalyzing ? (
+              <>
                 <Loader2 className="w-6 h-6 mr-3 animate-spin" />
                 Analyzing...
-              </> : 'Get Diagnosis'}
-          </Button>}
+              </>
+            ) : (
+              'Get Diagnosis'
+            )}
+          </Button>
+        )}
 
         {/* Info Section */}
         <div className="text-center space-y-4">
@@ -242,57 +312,54 @@ const Index = () => {
           </p>
         </div>
 
-        {/* Results */}
-        {analysis && !isAnalyzing && <div className="space-y-4">
+        {/* Structured Results */}
+        {analysis && !isAnalyzing && (
+          <div className="space-y-6">
             <div className="text-center py-4">
-              <h3 className="text-xl font-medium text-gray-900 mb-1">Analysis Complete</h3>
-              <p className="text-gray-600 text-sm">Here's what we found</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Diagnosis Report</h3>
+              <p className="text-gray-600 text-sm">Professional plant health analysis</p>
             </div>
 
-            {parseAnalysis(analysis).map((section, index) => {
-          const getIcon = (title: string) => {
-            if (title.includes('IDENTIFICATION')) return <Leaf className="w-5 h-5 text-green-600" />;
-            if (title.includes('DISEASE') || title.includes('ISSUE')) return <Bug className="w-5 h-5 text-red-600" />;
-            if (title.includes('SYMPTOMS')) return <AlertCircle className="w-5 h-5 text-orange-600" />;
-            if (title.includes('CAUSES')) return <AlertTriangle className="w-5 h-5 text-amber-600" />;
-            if (title.includes('TREATMENT')) return <Pill className="w-5 h-5 text-blue-600" />;
-            if (title.includes('PREVENTION')) return <Shield className="w-5 h-5 text-green-600" />;
-            if (title.includes('PROGNOSIS')) return <CheckCircle className="w-5 h-5 text-purple-600" />;
-            return <Leaf className="w-5 h-5 text-gray-600" />;
-          };
-          const isHighPriority = section.title.includes('DISEASE') || section.title.includes('TREATMENT');
-          return <Card key={index} className={`bg-white rounded-lg shadow-sm border-0 ${isHighPriority ? 'ring-1 ring-red-200' : ''}`}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center">
-                          {getIcon(section.title)}
+            <div className="grid gap-4">
+              {parseAnalysis(analysis).map((section, index) => {
+                const isHighPriority = section.title.includes('DISEASE') || section.title.includes('TREATMENT');
+                const isIdentification = section.title.includes('IDENTIFICATION');
+                
+                return (
+                  <Card 
+                    key={index} 
+                    className={`bg-white rounded-xl shadow-sm border-0 overflow-hidden ${
+                      isHighPriority ? 'ring-2 ring-red-100 bg-red-50/30' : 
+                      isIdentification ? 'ring-2 ring-green-100 bg-green-50/30' : ''
+                    }`}
+                  >
+                    <CardContent className="p-5">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                            {getIcon(section.title)}
+                          </div>
+                          <h4 className="font-semibold text-gray-900 text-base">{section.title}</h4>
                         </div>
-                        <h4 className="font-medium text-gray-900 text-sm">{section.title}</h4>
+                        {section.title.includes('DISEASE') && getSeverityBadge(section.content)}
                       </div>
-                      {section.title.includes('DISEASE') && getSeverityBadge(section.content)}
-                    </div>
-                    <div className="ml-13 space-y-2">
-                      {section.content.split('\n').map((line, lineIndex) => {
-                  if (line.trim().startsWith('-')) {
-                    return <div key={lineIndex} className="flex items-start space-x-2 py-1">
-                              <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                              <span className="text-gray-700 text-sm leading-relaxed">{line.trim().substring(1).trim()}</span>
-                            </div>;
-                  }
-                  return line.trim() ? <p key={lineIndex} className="font-medium text-gray-800 text-sm mb-1">
-                            {line.trim()}
-                          </p> : null;
-                })}
-                    </div>
-                  </CardContent>
-                </Card>;
-        })}
-          </div>}
+                      
+                      <div className="ml-0 pl-13">
+                        {renderStructuredContent(section.content)}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Bottom padding */}
         <div className="h-8"></div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
