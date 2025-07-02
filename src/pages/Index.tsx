@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { Upload, Leaf, Camera, Loader2, AlertTriangle, Shield, Pill, X, CheckCircle, AlertCircle, Bug, ArrowLeft, Video } from 'lucide-react';
+import { Upload, Leaf, Camera, Loader2, AlertTriangle, Shield, Pill, X, CheckCircle, AlertCircle, Bug, ArrowLeft, Video, Copy, Clock, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -144,7 +144,6 @@ const Index = () => {
         const title = sections[i].replace(':', '').trim();
         const content = sections[i + 1].trim();
         
-        // Structure the content better
         const structuredContent = content
           .split('\n')
           .filter(line => line.trim())
@@ -160,21 +159,21 @@ const Index = () => {
     return parsedSections;
   };
 
-  const getSeverityBadge = (content: string) => {
+  const getSeverityInfo = (content: string) => {
     const lowerContent = content.toLowerCase();
     if (lowerContent.includes('severe')) {
-      return <Badge className="bg-red-500 text-white text-xs px-2 py-1">Severe</Badge>;
+      return { badge: <Badge className="bg-red-500 text-white text-xs px-2 py-1">Severe</Badge>, urgency: 'high', color: 'red' };
     }
     if (lowerContent.includes('moderate')) {
-      return <Badge className="bg-orange-500 text-white text-xs px-2 py-1">Moderate</Badge>;
+      return { badge: <Badge className="bg-orange-500 text-white text-xs px-2 py-1">Moderate</Badge>, urgency: 'medium', color: 'orange' };
     }
     if (lowerContent.includes('mild')) {
-      return <Badge className="bg-yellow-600 text-white text-xs px-2 py-1">Mild</Badge>;
+      return { badge: <Badge className="bg-yellow-600 text-white text-xs px-2 py-1">Mild</Badge>, urgency: 'low', color: 'yellow' };
     }
     if (lowerContent.includes('healthy')) {
-      return <Badge className="bg-green-500 text-white text-xs px-2 py-1">Healthy</Badge>;
+      return { badge: <Badge className="bg-green-500 text-white text-xs px-2 py-1">Healthy</Badge>, urgency: 'none', color: 'green' };
     }
-    return null;
+    return { badge: null, urgency: 'unknown', color: 'gray' };
   };
 
   const getIcon = (title: string) => {
@@ -188,19 +187,61 @@ const Index = () => {
     return <Leaf className="w-5 h-5 text-gray-600" />;
   };
 
-  const renderStructuredContent = (content: string) => {
+  const getUrgencyIndicator = (urgency: string) => {
+    switch (urgency) {
+      case 'high':
+        return <div className="flex items-center gap-1 text-red-600 text-xs font-medium">
+          <Zap className="w-3 h-3" />
+          Urgent Action Required
+        </div>;
+      case 'medium':
+        return <div className="flex items-center gap-1 text-orange-600 text-xs font-medium">
+          <Clock className="w-3 h-3" />
+          Action Needed Soon
+        </div>;
+      case 'low':
+        return <div className="flex items-center gap-1 text-yellow-600 text-xs font-medium">
+          <AlertCircle className="w-3 h-3" />
+          Monitor Closely
+        </div>;
+      default:
+        return null;
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Copied to clipboard!');
+  };
+
+  const renderStructuredContent = (content: string, isRecommendation = false) => {
     const lines = content.split('\n').filter(line => line.trim());
     
     return (
       <div className="space-y-3">
         {lines.map((line, index) => {
           if (line.trim().startsWith('-')) {
+            const text = line.trim().substring(1).trim();
             return (
-              <div key={index} className="flex items-start space-x-3 py-1">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                <span className="text-gray-700 text-sm leading-relaxed flex-1">
-                  {line.trim().substring(1).trim()}
-                </span>
+              <div key={index} className="flex items-start justify-between group py-2 px-3 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-colors">
+                <div className="flex items-start space-x-3 flex-1">
+                  <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
+                    isRecommendation ? 'bg-blue-500' : 'bg-gray-400'
+                  }`}></div>
+                  <span className="text-gray-700 text-sm leading-relaxed flex-1">
+                    {text}
+                  </span>
+                </div>
+                {isRecommendation && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                    onClick={() => copyToClipboard(text)}
+                  >
+                    <Copy className="w-3 h-3" />
+                  </Button>
+                )}
               </div>
             );
           } else if (line.trim()) {
@@ -216,6 +257,18 @@ const Index = () => {
         })}
       </div>
     );
+  };
+
+  const groupedSections = (sections: { title: string; content: string; }[]) => {
+    const groups = {
+      identification: sections.filter(s => s.title.includes('IDENTIFICATION')),
+      diagnosis: sections.filter(s => s.title.includes('DISEASE') || s.title.includes('ISSUE')),
+      analysis: sections.filter(s => s.title.includes('SYMPTOMS') || s.title.includes('CAUSES')),
+      treatment: sections.filter(s => s.title.includes('TREATMENT')),
+      prevention: sections.filter(s => s.title.includes('PREVENTION')),
+      prognosis: sections.filter(s => s.title.includes('PROGNOSIS'))
+    };
+    return groups;
   };
 
   return (
@@ -312,7 +365,7 @@ const Index = () => {
           </p>
         </div>
 
-        {/* Structured Results */}
+        {/* Grouped Analysis Results */}
         {analysis && !isAnalyzing && (
           <div className="space-y-6">
             <div className="text-center py-4">
@@ -320,38 +373,118 @@ const Index = () => {
               <p className="text-gray-600 text-sm">Professional plant health analysis</p>
             </div>
 
-            <div className="grid gap-4">
-              {parseAnalysis(analysis).map((section, index) => {
-                const isHighPriority = section.title.includes('DISEASE') || section.title.includes('TREATMENT');
-                const isIdentification = section.title.includes('IDENTIFICATION');
-                
-                return (
-                  <Card 
-                    key={index} 
-                    className={`bg-white rounded-xl shadow-sm border-0 overflow-hidden ${
-                      isHighPriority ? 'ring-2 ring-red-100 bg-red-50/30' : 
-                      isIdentification ? 'ring-2 ring-green-100 bg-green-50/30' : ''
-                    }`}
-                  >
-                    <CardContent className="p-5">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+            {(() => {
+              const sections = parseAnalysis(analysis);
+              const groups = groupedSections(sections);
+              
+              return (
+                <div className="space-y-8">
+                  {/* Plant Identification */}
+                  {groups.identification.map((section, index) => (
+                    <Card key={index} className="bg-white rounded-xl shadow-sm border-0 ring-2 ring-green-100 bg-green-50/30">
+                      <CardContent className="p-5">
+                        <div className="flex items-center space-x-3 mb-4">
+                          <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                             {getIcon(section.title)}
                           </div>
                           <h4 className="font-semibold text-gray-900 text-base">{section.title}</h4>
                         </div>
-                        {section.title.includes('DISEASE') && getSeverityBadge(section.content)}
-                      </div>
-                      
-                      <div className="ml-0 pl-13">
                         {renderStructuredContent(section.content)}
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  {/* Diagnosis & Severity */}
+                  {groups.diagnosis.map((section, index) => {
+                    const severityInfo = getSeverityInfo(section.content);
+                    return (
+                      <Card key={index} className={`bg-white rounded-xl shadow-sm border-0 ring-2 ring-${severityInfo.color}-100 bg-${severityInfo.color}-50/30`}>
+                        <CardContent className="p-5">
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-10 h-10 bg-${severityInfo.color}-100 rounded-full flex items-center justify-center`}>
+                                {getIcon(section.title)}
+                              </div>
+                              <h4 className="font-semibold text-gray-900 text-base">{section.title}</h4>
+                            </div>
+                            <div className="flex flex-col items-end gap-2">
+                              {severityInfo.badge}
+                              {getUrgencyIndicator(severityInfo.urgency)}
+                            </div>
+                          </div>
+                          {renderStructuredContent(section.content)}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+
+                  {/* Symptoms & Causes Analysis */}
+                  {groups.analysis.length > 0 && (
+                    <div className="space-y-4">
+                      <h4 className="text-lg font-semibold text-gray-900 px-2">Analysis Details</h4>
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {groups.analysis.map((section, index) => (
+                          <Card key={index} className="bg-white rounded-xl shadow-sm border-0">
+                            <CardContent className="p-5">
+                              <div className="flex items-center space-x-3 mb-4">
+                                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                                  {getIcon(section.title)}
+                                </div>
+                                <h4 className="font-semibold text-gray-900 text-base">{section.title}</h4>
+                              </div>
+                              {renderStructuredContent(section.content)}
+                            </CardContent>
+                          </Card>
+                        ))}
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+                    </div>
+                  )}
+
+                  {/* Treatment Recommendations */}
+                  {groups.treatment.map((section, index) => (
+                    <Card key={index} className="bg-white rounded-xl shadow-sm border-0 ring-2 ring-blue-100 bg-blue-50/30">
+                      <CardContent className="p-5">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                              {getIcon(section.title)}
+                            </div>
+                            <h4 className="font-semibold text-gray-900 text-base">{section.title}</h4>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => copyToClipboard(section.content)}
+                            className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                          >
+                            <Copy className="w-4 h-4 mr-2" />
+                            Copy All
+                          </Button>
+                        </div>
+                        {renderStructuredContent(section.content, true)}
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  {/* Prevention & Prognosis */}
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {[...groups.prevention, ...groups.prognosis].map((section, index) => (
+                      <Card key={index} className="bg-white rounded-xl shadow-sm border-0">
+                        <CardContent className="p-5">
+                          <div className="flex items-center space-x-3 mb-4">
+                            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                              {getIcon(section.title)}
+                            </div>
+                            <h4 className="font-semibold text-gray-900 text-base">{section.title}</h4>
+                          </div>
+                          {renderStructuredContent(section.content)}
+                        </CardContent>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
 
